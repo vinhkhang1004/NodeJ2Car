@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import PartDetail from './pages/PartDetail';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './components/AdminLayout';
+import AuthLayout from './components/AuthLayout';
 import Dashboard from './pages/admin/Dashboard';
 import PartList from './pages/admin/PartList';
 import PartEdit from './pages/admin/PartEdit';
@@ -30,9 +31,12 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search/:keyword" element={<Home />} />
+          <Route path="/part/:id" element={<PartDetail />} />
+        </Route>
+
+        <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/part/:id" element={<PartDetail />} />
         </Route>
         
         <Route element={<AdminRoute />}>
