@@ -5,6 +5,10 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PartDetail from './pages/PartDetail';
+import AdminRoute from './components/AdminRoute';
+import Dashboard from './pages/admin/Dashboard';
+import PartList from './pages/admin/PartList';
+import UserList from './pages/admin/UserList';
 
 function App() {
   return (
@@ -17,6 +21,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/part/:id" element={<PartDetail />} />
+          
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="/admin/parts" element={<PartList />} />
+            <Route path="/admin/users" element={<UserList />} />
+          </Route>
         </Routes>
       </main>
     </Router>
