@@ -30,13 +30,14 @@ const Navbar = () => {
       <div className="container flex items-center justify-between" style={{ padding: '1rem 20px' }}>
         
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2" style={{ zIndex: 50 }}>
+        <Link to={user && user.isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-2" style={{ zIndex: 50 }}>
           <Settings color="var(--primary-color)" size={28} />
           <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>J2<span style={{ color: 'var(--primary-color)' }}>Car</span></span>
         </Link>
 
         {/* Desktop Menu */}
         <div className="flex items-center gap-6" style={{ display: 'none' }} id="desktop-menu">
+          {(!user || !user.isAdmin) && (
           <form onSubmit={handleSearch} className="flex items-center" style={{ position: 'relative' }}>
             <input 
               type="text" 
@@ -50,9 +51,15 @@ const Navbar = () => {
               <Search size={20} />
             </button>
           </form>
+          )}
 
           {user ? (
             <div className="flex items-center gap-4">
+              {user.isAdmin && (
+                <Link to="/admin/dashboard" className="btn" style={{ padding: '0.5rem 1rem', borderRadius: '20px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary-color)' }}>
+                  Admin Dashboard
+                </Link>
+              )}
               <span className="flex items-center gap-2 text-muted">
                 <User size={18} /> {user.name}
               </span>
@@ -78,6 +85,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="mobile-menu" style={{ padding: '1rem', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)' }}>
+          {(!user || !user.isAdmin) && (
           <form onSubmit={handleSearch} className="flex items-center mb-4" style={{ position: 'relative' }}>
             <input 
               type="text" 
@@ -91,8 +99,14 @@ const Navbar = () => {
               <Search size={20} />
             </button>
           </form>
+          )}
           {user ? (
             <div className="flex flex-col gap-4">
+              {user.isAdmin && (
+                <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '0.5rem 0', fontWeight: '500', color: 'var(--primary-color)' }}>
+                  Admin Dashboard
+                </Link>
+              )}
               <span className="flex items-center gap-2 text-muted pb-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <User size={18} /> {user.name}
               </span>
