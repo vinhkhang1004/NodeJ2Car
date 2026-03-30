@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Loader2, Trash2, Check, X } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -35,52 +46,63 @@ const UserList = () => {
     };
 
     return (
-        <div className="animate-fade-in" style={{ paddingBottom: '3rem' }}>
-            <h1 className="title">Users</h1>
+        <div className="animate-fade-in pb-12 text-white/90">
+            <h1 className="text-3xl font-bold tracking-tight mb-8 text-white">Users</h1>
 
             {loading ? (
-                <div className="flex justify-center items-center" style={{ minHeight: '40vh' }}>
-                    <Loader2 className="animate-spin" size={48} color="var(--primary-color)" />
+                <div className="flex justify-center items-center min-h-[40vh]">
+                    <Loader2 className="animate-spin text-primary" size={48} />
                 </div>
             ) : error ? (
-                <div className="alert alert-error">{error}</div>
+                <Alert variant="destructive" className="mb-6">
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
             ) : (
-                <div className="card" style={{ padding: '0', overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'rgba(15, 23, 42, 0.3)' }}>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>ID</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>NAME</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>EMAIL</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>ADMIN</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <Card className="overflow-hidden bg-[#18181b] border-slate-800 shadow-xl shadow-black/20">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-[#27272a]/50 hover:bg-[#27272a]/50 border-slate-800">
+                                <TableHead className="w-[100px] text-slate-400">ID</TableHead>
+                                <TableHead className="text-slate-400">NAME</TableHead>
+                                <TableHead className="text-slate-400">EMAIL</TableHead>
+                                <TableHead className="text-slate-400">ADMIN</TableHead>
+                                <TableHead className="text-right text-slate-400">ACTIONS</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody className="divide-slate-800/80">
                             {users.map((user) => (
-                                <tr key={user._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                    <td style={{ padding: '1rem', fontSize: '0.9rem' }}>{user._id}</td>
-                                    <td style={{ padding: '1rem' }}>{user.name}</td>
-                                    <td style={{ padding: '1rem' }}><a href={`mailto:${user.email}`} style={{ color: 'var(--primary-color)' }}>{user.email}</a></td>
-                                    <td style={{ padding: '1rem' }}>
+                                <TableRow key={user._id} className="hover:bg-slate-800/30 border-slate-800/80">
+                                    <TableCell className="font-mono text-xs text-slate-500">{user._id}</TableCell>
+                                    <TableCell className="font-medium text-white">{user.name}</TableCell>
+                                    <TableCell>
+                                        <a href={`mailto:${user.email}`} className="text-[#a78bfa] hover:underline">
+                                            {user.email}
+                                        </a>
+                                    </TableCell>
+                                    <TableCell>
                                         {user.isAdmin ? (
-                                            <Check color="var(--success-color)" size={20} />
+                                            <Check className="text-green-500" size={20} />
                                         ) : (
-                                            <X color="var(--error-color)" size={20} />
+                                            <X className="text-red-500" size={20} />
                                         )}
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
+                                    </TableCell>
+                                    <TableCell className="text-right">
                                         {!user.isAdmin && (
-                                            <button className="btn" style={{ padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error-color)' }} onClick={() => deleteHandler(user._id)}>
+                                            <Button 
+                                                variant="outline" 
+                                                size="icon" 
+                                                onClick={() => deleteHandler(user._id)}
+                                                className="bg-transparent border-red-900/50 text-red-500 hover:bg-red-950/30 hover:text-red-400"
+                                            >
                                                 <Trash2 size={16} />
-                                            </button>
+                                            </Button>
                                         )}
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
+                        </TableBody>
+                    </Table>
+                </Card>
             )}
         </div>
     );
