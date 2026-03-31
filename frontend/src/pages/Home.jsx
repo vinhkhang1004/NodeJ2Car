@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
-import PartCard from '../components/PartCard';
+import ProductCard from '../components/ProductCard';
 import { Loader2 } from 'lucide-react';
 
 const Home = () => {
-  const [parts, setParts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
   const { keyword } = useParams();
 
   useEffect(() => {
-    const fetchParts = async () => {
+    const fetchProducts = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get(`/parts${keyword ? `?keyword=${keyword}` : ''}`);
-        setParts(data);
+        const { data } = await api.get(`/products${keyword ? `?keyword=${keyword}` : ''}`);
+        setProducts(data.products || []);
         setError('');
       } catch (err) {
         setError(err.response && err.response.data.message ? err.response.data.message : err.message);
@@ -25,7 +25,7 @@ const Home = () => {
       }
     };
 
-    fetchParts();
+    fetchProducts();
   }, [keyword]);
 
   return (
@@ -45,15 +45,15 @@ const Home = () => {
         </div>
       ) : error ? (
         <div className="alert alert-error">{error}</div>
-      ) : parts.length === 0 ? (
+      ) : products.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
-          <h2>No parts found.</h2>
+          <h2>No products found.</h2>
           <p>Try searching with a different keyword.</p>
         </div>
       ) : (
         <div className="grid grid-cols-3">
-          {parts.map(part => (
-            <PartCard key={part._id} part={part} />
+          {products.map(product => (
+            <ProductCard key={product._id} product={product} />
           ))}
         </div>
       )}
