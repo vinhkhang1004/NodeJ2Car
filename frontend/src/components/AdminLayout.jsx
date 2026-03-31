@@ -5,6 +5,7 @@ import {
     LayoutDashboard, 
     Users, 
     Package, 
+    Tag,
     Settings, 
     LogOut,
     HelpCircle,
@@ -24,7 +25,9 @@ const AdminLayout = () => {
     const navItems = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
         { name: 'Users', icon: Users, path: '/admin/users' },
-        { name: 'Parts', icon: Package, path: '/admin/parts' },
+        { name: 'Sản phẩm', icon: Package, path: '/admin/products' },
+        { name: 'Danh mục', icon: Tag, path: '/admin/categories' },
+
     ];
 
     return (
