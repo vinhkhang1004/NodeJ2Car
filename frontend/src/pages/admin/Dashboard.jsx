@@ -19,20 +19,20 @@ const chartData = [
 ];
 
 const AdminDashboard = () => {
-    const [stats, setStats] = useState({ totalParts: 0, totalUsers: 0 });
-    const [parts, setParts] = useState([]);
+    const [stats, setStats] = useState({ totalProducts: 0, totalUsers: 0 });
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsRes, partsRes] = await Promise.all([
-                    api.get('/parts/admin/stats'),
-                    api.get('/parts')
+                const [statsRes, productsRes] = await Promise.all([
+                    api.get('/products/admin/stats'),
+                    api.get('/products')
                 ]);
                 setStats(statsRes.data);
-                setParts(partsRes.data.slice(0, 7)); // Only show top 7 in dashboard
+                setProducts(productsRes.data.products?.slice(0, 7) || []); // Only show top 7 in dashboard
                 setLoading(false);
             } catch (err) {
                 setLoading(false);
@@ -52,7 +52,7 @@ const AdminDashboard = () => {
             {/* Header */}
             <div className="flex justify-between items-center bg-[#09090b]">
                 <h1 className="text-2xl font-bold tracking-tight text-white">Admin Overview</h1>
-                <Button onClick={() => navigate('/admin/part/create')} className="bg-white text-black hover:bg-slate-200">
+                <Button onClick={() => navigate('/admin/products/create')} className="bg-white text-black hover:bg-slate-200">
                     <Plus className="mr-2 h-4 w-4" /> Quick Create
                 </Button>
             </div>
@@ -73,11 +73,11 @@ const AdminDashboard = () => {
 
                 <Card className="bg-[#18181b] border-slate-800 text-white shadow-xl shadow-black/20">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-400">Total Parts</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-400">Total Products</CardTitle>
                         <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">↘ -20%</Badge>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-white mb-2">{stats.totalParts}</div>
+                        <div className="text-3xl font-bold text-white mb-2">{stats.totalProducts}</div>
                         <p className="text-xs text-white/80 font-medium">Down 20% this period ↘</p>
                         <p className="text-xs text-slate-500">Inventory needs attention</p>
                     </CardContent>
@@ -182,12 +182,12 @@ const AdminDashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/80">
-                                {parts.map((item, idx) => (
+                                {products.map((item, idx) => (
                                     <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
                                         <td className="px-6 py-4"><input type="checkbox" className="rounded bg-black border-slate-700 accent-white" /></td>
                                         <td className="px-6 py-4 font-medium text-white">{item.name}</td>
                                         <td className="px-6 py-4 text-slate-400">
-                                            <span className="px-2.5 py-1 rounded-full border border-slate-700 text-xs">{item.category}</span>
+                                            <span className="px-2.5 py-1 rounded-full border border-slate-700 text-xs">{item.category?.name || 'Uncategorized'}</span>
                                         </td>
                                         <td className="px-6 py-4">
                                             {item.stock > 0 ? (
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
                                         </td>
                                     </tr>
                                 ))}
-                                {parts.length === 0 && (
+                                {products.length === 0 && (
                                      <tr>
                                         <td colSpan="7" className="px-6 py-8 text-center text-slate-500">No data found.</td>
                                     </tr>
@@ -213,7 +213,7 @@ const AdminDashboard = () => {
                             </tbody>
                         </table>
                         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 text-xs text-slate-400 bg-[#18181b]">
-                            <div>0 of {parts.length} row(s) selected.</div>
+                            <div>0 of {products.length} row(s) selected.</div>
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-2">
                                     <span>Rows per page</span>
