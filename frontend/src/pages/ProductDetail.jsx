@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchProductById } from '../services/productService';
 import { Loader2, ArrowLeft, ShoppingCart, Tag, AlertCircle } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
 
 const ProductDetail = () => {
     const { id } = useParams();
+    const { addToCart } = React.useContext(CartContext);
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -103,7 +105,7 @@ const ProductDetail = () => {
                     </h1>
 
                     <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--success-color)', marginBottom: '1.5rem' }}>
-                        {product.price?.toLocaleString('vi-VN')}₫
+                        {product.price?.toLocaleString('vi-VN')} VNĐ
                     </div>
 
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
@@ -143,7 +145,10 @@ const ProductDetail = () => {
                             className="btn btn-primary btn-block" 
                             style={{ padding: '1rem', fontSize: '1.1rem', opacity: product.stock <= 0 ? 0.5 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
                             disabled={product.stock <= 0}
-                            onClick={() => alert('Thêm vào giỏ hàng chưa được phát triển!')}
+                            onClick={() => {
+                                addToCart(product, 1);
+                                alert('Đã thêm sản phẩm vào giỏ hàng!');
+                            }}
                         >
                             <ShoppingCart size={20} />
                             {product.stock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}

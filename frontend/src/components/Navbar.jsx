@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Search, LogOut, User, Menu, X, Settings } from 'lucide-react';
+import { Search, LogOut, User, Menu, X, Settings, ShoppingCart } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const { totalItems } = useContext(CartContext);
   const [keyword, setKeyword] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -55,6 +57,14 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center gap-4">
+              <Link to="/cart" className="flex items-center relative mr-2" style={{ color: 'var(--text-main)' }}>
+                <ShoppingCart size={24} />
+                {totalItems > 0 && (
+                  <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary-color)', color: 'white', borderRadius: '50%', padding: '2px 6px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
               {user.isAdmin && (
                 <Link to="/admin/dashboard" className="btn" style={{ padding: '0.5rem 1rem', borderRadius: '20px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary-color)' }}>
                   Admin Dashboard
@@ -69,6 +79,14 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-4">
+              <Link to="/cart" className="flex items-center relative mr-2 text-muted hover-white" style={{ transition: 'color 0.2s' }}>
+                <ShoppingCart size={24} />
+                {totalItems > 0 && (
+                  <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary-color)', color: 'white', borderRadius: '50%', padding: '2px 6px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
               <Link to="/login" style={{ fontWeight: '500' }}>Login</Link>
               <Link to="/register" className="btn btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '20px' }}>Sign Up</Link>
             </div>

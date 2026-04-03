@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
+
   return (
-    <Link to={`/product/${product._id}`} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0', overflow: 'hidden' }}>
+    <div className="card" onClick={() => navigate(`/product/${product._id}`)} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0', overflow: 'hidden', cursor: 'pointer' }}>
       <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>
         <img 
           src={product.imageUrl?.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl} 
@@ -19,18 +21,27 @@ const ProductCard = ({ product }) => {
             {product.category?.name || 'Uncategorized'}
           </span>
           <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--success-color)' }}>
-            ${product.price?.toFixed(2)}
+            {new Intl.NumberFormat('vi-VN').format(product.price || 0)} VNĐ
           </span>
         </div>
         <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', fontWeight: '600' }}>{product.name}</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', flexGrow: 1 }}>
           {product.description?.substring(0, 80)}...
         </p>
-        <div style={{ fontSize: '0.85rem', color: product.stock > 0 ? 'var(--text-muted)' : 'var(--error-color)', fontWeight: '500' }}>
+        <div style={{ fontSize: '0.85rem', color: product.stock > 0 ? 'var(--text-muted)' : 'var(--error-color)', fontWeight: '500', marginBottom: '1rem' }}>
           {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
         </div>
+        <button 
+          className="btn btn-primary w-full mt-auto" 
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/product/${product._id}`);
+          }}
+        >
+          Xem chi tiết
+        </button>
       </div>
-    </Link>
+    </div>
   );
 };
 

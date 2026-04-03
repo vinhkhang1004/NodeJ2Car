@@ -25,6 +25,7 @@ import CategoryDetail from './pages/admin/CategoryDetail';
 import UserList from './pages/admin/UserList';
 
 import PublicProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
 
 function PublicLayout() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/search/:keyword" element={<Home />} />
           <Route path="/product/:id" element={<PublicProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
 
         {/* Auth */}
