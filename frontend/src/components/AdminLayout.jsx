@@ -22,9 +22,9 @@ const AdminLayout = () => {
     };
 
     const navItems = [
-        { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
-        { name: 'Users', icon: Users, path: '/admin/users' },
-        { name: 'Parts', icon: Package, path: '/admin/parts' },
+        { name: 'Bảng điều khiển', icon: LayoutDashboard, path: '/admin/dashboard' },
+        { name: 'Người dùng', icon: Users, path: '/admin/users' },
+        { name: 'Linh kiện', icon: Package, path: '/admin/parts' },
     ];
 
     return (
@@ -34,11 +34,11 @@ const AdminLayout = () => {
                 <div>
                     <div className="p-6">
                         <div className="flex items-center gap-3 font-semibold text-lg text-white mb-8">
-                            <CarFront className="h-6 w-6 text-primary" />
-                            Acme Auto
+                            <CarFront className="h-6 w-6 text-orange-500" />
+                            J2Car Admin
                         </div>
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-3">
-                            Home
+                            Chính
                         </div>
                         <nav className="space-y-1 px-2">
                             {navItems.map((item) => (
@@ -64,13 +64,13 @@ const AdminLayout = () => {
                 <div className="p-4 border-t border-slate-800 space-y-4">
                     <nav className="space-y-1 px-2">
                         <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
-                            <Settings className="h-4 w-4" /> Settings
+                            <Settings className="h-4 w-4" /> Cài đặt
                         </a>
                         <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
-                            <HelpCircle className="h-4 w-4" /> Get Help
+                            <HelpCircle className="h-4 w-4" /> Trợ giúp
                         </a>
                         <button onClick={logoutHandler} className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-red-500 hover:bg-red-950/30 transition-colors">
-                            <LogOut className="h-4 w-4" /> Logout
+                            <LogOut className="h-4 w-4" /> Đăng xuất
                         </button>
                     </nav>
 

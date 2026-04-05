@@ -25,7 +25,7 @@ const PartList = () => {
         try {
             setLoading(true);
             const { data } = await api.get('/parts');
-            setParts(data);
+            setParts(data.parts || []);
             setLoading(false);
         } catch (err) {
             setError(err.response?.data?.message || err.message);
@@ -38,7 +38,7 @@ const PartList = () => {
     }, []);
 
     const deleteHandler = async (id) => {
-        if (window.confirm('Are you sure you want to delete this part?')) {
+        if (window.confirm('Bạn có chắc chắn muốn xóa linh kiện này không?')) {
             try {
                 await api.delete(`/parts/${id}`);
                 fetchParts();
@@ -55,9 +55,9 @@ const PartList = () => {
     return (
         <div className="animate-fade-in pb-12 text-white/90">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-white">Inventory Items</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-white">Danh sách linh kiện</h1>
                 <Button onClick={createPartHandler} className="bg-white text-black hover:bg-slate-200">
-                    <Plus className="mr-2 h-4 w-4" /> Create Part
+                    <Plus className="mr-2 h-4 w-4" /> Thêm linh kiện
                 </Button>
             </div>
 
@@ -74,13 +74,13 @@ const PartList = () => {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-[#27272a]/50 hover:bg-[#27272a]/50 border-slate-800">
-                                <TableHead className="w-[100px] text-slate-400">ID</TableHead>
-                                <TableHead className="text-slate-400">NAME</TableHead>
-                                <TableHead className="text-slate-400">PRICE</TableHead>
-                                <TableHead className="text-slate-400">CATEGORY</TableHead>
-                                <TableHead className="text-slate-400">BRAND</TableHead>
-                                <TableHead className="text-slate-400">STATUS</TableHead>
-                                <TableHead className="text-right text-slate-400">ACTIONS</TableHead>
+                                <TableHead className="w-[100px] text-slate-400">ID (MÃ)</TableHead>
+                                <TableHead className="text-slate-400">TÊN LINH KIỆN</TableHead>
+                                <TableHead className="text-slate-400">GIÁ BÁN</TableHead>
+                                <TableHead className="text-slate-400">DANH MỤC</TableHead>
+                                <TableHead className="text-slate-400">THƯƠNG HIỆU</TableHead>
+                                <TableHead className="text-slate-400">TRẠNG THÁI</TableHead>
+                                <TableHead className="text-right text-slate-400">HÀNH ĐỘNG</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-slate-800/80">
@@ -88,16 +88,16 @@ const PartList = () => {
                                 <TableRow key={part._id} className="hover:bg-slate-800/30 border-slate-800/80">
                                     <TableCell className="font-mono text-xs text-slate-500">{part._id}</TableCell>
                                     <TableCell className="font-medium text-white">{part.name}</TableCell>
-                                    <TableCell className="text-white font-mono">${part.price.toFixed(2)}</TableCell>
+                                    <TableCell className="text-white font-mono">${(part.price || 0).toFixed(2)}</TableCell>
                                     <TableCell>
                                         <span className="px-2.5 py-1 rounded-full border border-slate-700 text-xs text-slate-400">{part.category}</span>
                                     </TableCell>
                                     <TableCell className="text-white">{part.brand}</TableCell>
                                     <TableCell>
                                         {part.stock > 0 ? (
-                                            <span className="flex items-center text-green-400 text-xs font-medium"><span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span> Done ({part.stock})</span>
+                                            <span className="flex items-center text-green-400 text-xs font-medium"><span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span> Còn hàng ({part.stock})</span>
                                         ) : (
-                                            <span className="flex items-center text-slate-400 text-xs font-medium"><span className="w-1.5 h-1.5 rounded-full bg-slate-500 mr-2"></span> In Process</span>
+                                            <span className="flex items-center text-slate-400 text-xs font-medium"><span className="w-1.5 h-1.5 rounded-full bg-slate-500 mr-2"></span> Hết hàng</span>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">

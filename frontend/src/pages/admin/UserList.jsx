@@ -35,7 +35,7 @@ const UserList = () => {
     }, []);
 
     const deleteHandler = async (id) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
+        if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này không?')) {
             try {
                 await api.delete(`/auth/${id}`);
                 fetchUsers();
@@ -47,7 +47,7 @@ const UserList = () => {
 
     return (
         <div className="animate-fade-in pb-12 text-white/90">
-            <h1 className="text-3xl font-bold tracking-tight mb-8 text-white">Users</h1>
+            <h1 className="text-3xl font-bold tracking-tight mb-8 text-white">Danh sách người dùng</h1>
 
             {loading ? (
                 <div className="flex justify-center items-center min-h-[40vh]">
@@ -62,11 +62,11 @@ const UserList = () => {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-[#27272a]/50 hover:bg-[#27272a]/50 border-slate-800">
-                                <TableHead className="w-[100px] text-slate-400">ID</TableHead>
-                                <TableHead className="text-slate-400">NAME</TableHead>
+                                <TableHead className="w-[100px] text-slate-400">ID (MÃ)</TableHead>
+                                <TableHead className="text-slate-400">TÊN NGƯỜI DÙNG</TableHead>
                                 <TableHead className="text-slate-400">EMAIL</TableHead>
-                                <TableHead className="text-slate-400">ADMIN</TableHead>
-                                <TableHead className="text-right text-slate-400">ACTIONS</TableHead>
+                                <TableHead className="text-slate-400">QUYỀN ADMIN</TableHead>
+                                <TableHead className="text-right text-slate-400">HÀNH ĐỘNG</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-slate-800/80">

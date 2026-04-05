@@ -88,11 +88,11 @@ const PartEdit = () => {
             <div className="flex items-center gap-4 mb-8">
                 <Button variant="outline" asChild className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
                     <Link to="/admin/parts">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
                     </Link>
                 </Button>
                 <h1 className="text-3xl font-bold tracking-tight text-white">
-                    {isEditMode ? 'Edit Section Item' : 'Create Section Item'}
+                    {isEditMode ? 'Chỉnh sửa linh kiện' : 'Thêm linh kiện mới'}
                 </h1>
             </div>
 
@@ -107,38 +107,38 @@ const PartEdit = () => {
                     <form onSubmit={submitHandler} className="space-y-6">
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label htmlFor="name" className="text-slate-400">Section Header</Label>
+                                <Label htmlFor="name" className="text-slate-400">Tên linh kiện</Label>
                                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="brand" className="text-slate-400">Reviewer (Brand)</Label>
+                                <Label htmlFor="brand" className="text-slate-400">Thương hiệu</Label>
                                 <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="price" className="text-slate-400">Target Level / Price ($)</Label>
+                                <Label htmlFor="price" className="text-slate-400">Giá bán ($)</Label>
                                 <Input id="price" type="number" step="0.01" value={price} onChange={(e) => setPrice(Number(e.target.value))} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="category" className="text-slate-400">Section Type</Label>
+                                <Label htmlFor="category" className="text-slate-400">Danh mục</Label>
                                 <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="stock" className="text-slate-400">Limit / Stock Quantity</Label>
+                                <Label htmlFor="stock" className="text-slate-400">Số lượng tồn kho</Label>
                                 <Input id="stock" type="number" value={stock} onChange={(e) => setStock(Number(e.target.value))} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="imageUrl" className="text-slate-400">Image URL</Label>
+                                <Label htmlFor="imageUrl" className="text-slate-400">Đường dẫn ảnh (URL)</Label>
                                 <Input id="imageUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required className="bg-[#09090b] border-slate-700 text-white" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="description" className="text-slate-400">Description</Label>
+                            <Label htmlFor="description" className="text-slate-400">Mô tả chi tiết</Label>
                             <Textarea 
                                 id="description"
                                 rows={5}
@@ -151,9 +151,9 @@ const PartEdit = () => {
 
                         <Button type="submit" disabled={loadingUpdate} className="w-full sm:w-auto bg-white text-black hover:bg-slate-200">
                             {loadingUpdate ? (
-                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</>
                             ) : (
-                                <><Save className="mr-2 h-4 w-4" /> {isEditMode ? 'Save Changes' : 'Create Item'}</>
+                                <><Save className="mr-2 h-4 w-4" /> {isEditMode ? 'Lưu thay đổi' : 'Tạo linh kiện'}</>
                             )}
                         </Button>
                     </form>

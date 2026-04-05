@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PartDetail from './pages/PartDetail';
+import Shop from './pages/Shop';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './components/AdminLayout';
 import AuthLayout from './components/AuthLayout';
@@ -17,7 +18,7 @@ function PublicLayout() {
   return (
     <>
       <Navbar />
-      <main className="container mt-8 animate-fade-in">
+      <main className="animate-fade-in">
         <Outlet />
       </main>
     </>
@@ -30,7 +31,8 @@ function App() {
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/search/:keyword" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/search/:keyword" element={<Shop />} />
           <Route path="/part/:id" element={<PartDetail />} />
         </Route>
 
