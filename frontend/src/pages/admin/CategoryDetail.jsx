@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getFileUrl } from '../../lib/utils';
 import api from '../../services/api';
 
 const CategoryDetail = () => {
@@ -107,7 +108,7 @@ const CategoryDetail = () => {
                         <CardContent className="pt-6">
                             {category.imageUrl ? (
                                 <img
-                                    src={category.imageUrl}
+                                    src={getFileUrl(category.imageUrl)}
                                     alt={category.name}
                                     className="w-full aspect-video object-cover rounded-lg border border-slate-700 mb-4"
                                     onError={(e) => { e.target.style.display = 'none'; }}
@@ -207,7 +208,7 @@ const CategoryDetail = () => {
                                             className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 transition-colors"
                                         >
                                             <img
-                                                src={p.imageUrl?.startsWith('/') ? `http://localhost:5000${p.imageUrl}` : p.imageUrl}
+                                                src={getFileUrl(p.imageUrl)}
                                                 alt={p.name}
                                                 className="w-10 h-10 rounded object-cover border border-slate-700"
                                                 onError={(e) => { e.target.src = 'https://placehold.co/40x40/27272a/71717a?text=?'; }}
