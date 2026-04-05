@@ -10,13 +10,17 @@ const {
 } = require('../controllers/productController.js');
 const { protect, admin } = require('../middleware/authMiddleware.js');
 
-// Public routes
-router.route('/').get(getProducts);
-router.route('/:id').get(getProductById);
-
-// Admin routes — must define /admin/stats BEFORE /:id to avoid conflicts
+// IMPORTANT: Specific routes MUST be declared before /:id to avoid conflicts
+// Admin stats route
 router.route('/admin/stats').get(protect, admin, getAdminStats);
-router.route('/').post(protect, admin, createProduct);
-router.route('/:id').put(protect, admin, updateProduct).delete(protect, admin, deleteProduct);
+
+// Public routes
+router.route('/').get(getProducts).post(protect, admin, createProduct);
+
+// Dynamic :id routes last
+router.route('/:id')
+    .get(getProductById)
+    .put(protect, admin, updateProduct)
+    .delete(protect, admin, deleteProduct);
 
 module.exports = router;

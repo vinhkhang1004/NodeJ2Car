@@ -16,6 +16,18 @@ export const updateProfile = async (userData) => {
     return await api.put('/auth/profile', userData);
 };
 
+export const addAddress = async (addressData) => {
+    return await api.post('/auth/addresses', addressData);
+};
+
+export const deleteAddress = async (addressId) => {
+    return await api.delete(`/auth/addresses/${addressId}`);
+};
+
+export const setDefaultAddress = async (addressId) => {
+    return await api.put(`/auth/addresses/${addressId}/default`);
+};
+
 export const fetchUsers = async () => {
     return await api.get('/auth/users');
 };

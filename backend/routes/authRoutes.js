@@ -6,6 +6,9 @@ const {
     logoutUser,
     getUserProfile,
     updateUserProfile,
+    addAddress,
+    deleteAddress,
+    setDefaultAddress,
     getUsers,
     deleteUser,
 } = require('../controllers/authController.js');
@@ -17,6 +20,11 @@ router.post('/logout', logoutUser);
 router.route('/profile')
     .get(protect, getUserProfile)
     .put(protect, updateUserProfile);
+
+// Address routes
+router.route('/addresses').post(protect, addAddress);
+router.route('/addresses/:addressId').delete(protect, deleteAddress);
+router.route('/addresses/:addressId/default').put(protect, setDefaultAddress);
 
 // Admin routes
 router.route('/users').get(protect, admin, getUsers);

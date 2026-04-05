@@ -148,6 +148,78 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+// @desc    Get admin dashboard stats (orders + revenue)
+// @route   GET /api/orders/dashboard
+// @access  Private/Admin
+const getDashboardStats = async (req, res) => {
+    try {
+        const now = new Date();
+        const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+        const [
+            totalOrders,
+            thisMonthOrders,
+            lastMonthOrders,
+            revenueResult,
+            thisMonthRevenue,
+            lastMonthRevenue,
+            statusCounts,
+            recentOrders,
+            revenueByDay,
+        ] = await Promise.all([
+            Order.countDocuments(),
+            Order.countDocuments({ createdAt: { $gte: startOfThisMonth } }),
+            Order.countDocuments({ createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }),
+            Order.aggregate([{ $group: { _id: null, total: { $sum: '$totalPrice' } } }]),
+            Order.aggregate([
+                { $match: { createdAt: { $gte: startOfThisMonth } } },
+                { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+            ]),
+            Order.aggregate([
+                { $match: { createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } } },
+                { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+            ]),
+            Order.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
+            Order.find({}).populate('user', 'name email').sort({ createdAt: -1 }).limit(5),
+            Order.aggregate([
+                {
+                    $match: {
+                        createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) }
+                    }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                        revenue: { $sum: '$totalPrice' },
+                        orders: { $sum: 1 },
+                    }
+                },
+                { $sort: { _id: 1 } }
+            ]),
+        ]);
+
+        const totalRevenue = revenueResult[0]?.total || 0;
+        const thisMonthRev = thisMonthRevenue[0]?.total || 0;
+        const lastMonthRev = lastMonthRevenue[0]?.total || 0;
+
+        res.json({
+            totalOrders,
+            thisMonthOrders,
+            lastMonthOrders,
+            totalRevenue,
+            thisMonthRevenue: thisMonthRev,
+            lastMonthRevenue: lastMonthRev,
+            statusCounts,
+            recentOrders,
+            revenueByDay,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     addOrderItems,
     getOrderById,
@@ -156,4 +228,5 @@ module.exports = {
     getMyOrders,
     getOrders,
     updateOrderStatus,
+    getDashboardStats,
 };

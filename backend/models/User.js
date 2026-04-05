@@ -41,6 +41,20 @@ const userSchema = mongoose.Schema(
             type: String,
             default: '',
         },
+        addresses: [
+            {
+                label: { type: String, default: '' },
+                name: { type: String, required: true },
+                phone: { type: String, required: true },
+                address: { type: String, required: true },
+                city: { type: String, required: true },
+                country: { type: String, default: 'Việt Nam' },
+                postalCode: { type: String, default: '' },
+                lat: { type: Number },
+                lng: { type: Number },
+                isDefault: { type: Boolean, default: false },
+            }
+        ],
     },
     {
         timestamps: true,
