@@ -100,7 +100,7 @@ const ProductDetail = () => {
                     <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20">
                         <CardContent className="pt-6">
                             <img
-                                src={product.imageUrl}
+                                src={product.imageUrl?.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl}
                                 alt={product.name}
                                 className="w-full aspect-square object-cover rounded-lg border border-slate-700 mb-4"
                                 onError={(e) => { e.target.src = 'https://placehold.co/400x400/27272a/71717a?text=No+Image'; }}
