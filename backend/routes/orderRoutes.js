@@ -8,8 +8,12 @@ const {
     getMyOrders,
     getOrders,
     updateOrderStatus,
+    getDashboardStats,
 } = require('../controllers/orderController.js');
 const { protect, admin } = require('../middleware/authMiddleware.js');
+
+// @route   GET /api/orders/dashboard
+router.route('/dashboard').get(protect, admin, getDashboardStats);
 
 // @route   GET /api/orders
 // @route   POST /api/orders

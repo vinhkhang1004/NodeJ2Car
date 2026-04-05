@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { updateProfile } from '../services/authService';
+import { updateProfile, deleteAddress, setDefaultAddress } from '../services/authService';
 import { fetchMyOrders } from '../services/orderService';
 import { 
     User, Mail, Lock, Loader2, ShoppingBag, 
     ChevronRight, CheckCircle, Clock, Truck, XCircle, AlertCircle,
-    Phone, MapPin, Globe, Building, Navigation
+    Phone, MapPin, Globe, Building, Navigation, Plus, Trash2, Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,10 +14,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import AddAddressModal from '../components/AddAddressModal';
 
 const Profile = () => {
-    const { user, updateUserInfo } = useContext(AuthContext);
-    
+    const { user, addresses, updateUserInfo, updateAddresses } = useContext(AuthContext);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [localAddresses, setLocalAddresses] = useState(addresses || []);
+
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
     const [phone, setPhone] = useState(user?.phone || '');
@@ -35,6 +38,11 @@ const Profile = () => {
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
 
+    // Sync addresses when context updates
+    useEffect(() => {
+        setLocalAddresses(addresses || []);
+    }, [addresses]);
+
     useEffect(() => {
         const loadOrders = async () => {
             try {
@@ -48,6 +56,32 @@ const Profile = () => {
         };
         loadOrders();
     }, []);
+
+    const handleAddressSaved = (newAddresses) => {
+        setLocalAddresses(newAddresses);
+        updateAddresses(newAddresses);
+    };
+
+    const handleDeleteAddress = async (addressId) => {
+        if (!window.confirm('Xóa địa chỉ này?')) return;
+        try {
+            const { data } = await deleteAddress(addressId);
+            setLocalAddresses(data.addresses);
+            updateAddresses(data.addresses);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSetDefault = async (addressId) => {
+        try {
+            const { data } = await setDefaultAddress(addressId);
+            setLocalAddresses(data.addresses);
+            updateAddresses(data.addresses);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -279,74 +313,92 @@ const Profile = () => {
                     </Card>
                 </div>
 
-                {/* Orders History */}
-                <div className="lg:col-span-2 space-y-6">
-                     <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
+                {/* Address Management — full width below */}
+                <div className="lg:col-span-3">
+                    <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
                         <CardHeader className="bg-[#27272a]/30 border-b border-slate-800">
-                             <div className="flex justify-between items-center">
+                            <div className="flex items-center justify-between">
                                 <div>
                                     <CardTitle className="text-xl flex items-center gap-2">
-                                        <ShoppingBag size={20} className="text-primary" /> Lịch sử đơn hàng
+                                        <MapPin size={20} className="text-primary" /> Địa chỉ của tôi
                                     </CardTitle>
-                                    <CardDescription className="text-slate-500">Các giao dịch bạn đã thực hiện.</CardDescription>
+                                    <CardDescription className="text-slate-500">
+                                        Quản lý địa chỉ giao hàng. Sử dụng bản đồ để chọn vị trí chính xác.
+                                    </CardDescription>
                                 </div>
-                                <Badge className="bg-slate-800 text-slate-400">{orders.length} đơn hàng</Badge>
-                             </div>
+                                <Button
+                                    onClick={() => setShowAddModal(true)}
+                                    className="bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-bold flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Thêm địa chỉ
+                                </Button>
+                            </div>
                         </CardHeader>
-                        <CardContent className="pt-0 px-0">
-                            {loadingOrders ? (
-                                <div className="flex justify-center py-20">
-                                    <Loader2 className="animate-spin text-primary" size={40} />
-                                </div>
-                            ) : orders.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-slate-900/50 text-slate-500 uppercase text-[10px] tracking-widest border-b border-slate-800">
-                                            <tr>
-                                                <th className="px-6 py-4">Mã đơn</th>
-                                                <th className="px-6 py-4 text-center">Ngày đặt</th>
-                                                <th className="px-6 py-4 text-center">Tổng tiền</th>
-                                                <th className="px-6 py-4 text-center">Trạng thái</th>
-                                                <th className="px-6 py-4"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-800/50">
-                                            {orders.map((order) => (
-                                                <tr key={order._id} className="hover:bg-slate-800/20 transition-colors group">
-                                                    <td className="px-6 py-4 font-mono text-xs text-slate-400">
-                                                        #{order._id.substring(18).toUpperCase()}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center text-slate-300">
-                                                        {new Date(order.createdAt).toLocaleDateString('vi-VN')}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center font-bold text-success">
-                                                        {order.totalPrice.toLocaleString('vi-VN')}₫
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        {getStatusBadge(order.status)}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        {/* Link to order details (can be built later if needed) */}
-                                                        <span className="text-slate-600 group-hover:text-primary transition-colors cursor-pointer">
-                                                            <ChevronRight size={18} />
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                        <CardContent className="pt-6">
+                            {localAddresses.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-14 opacity-40">
+                                    <MapPin size={56} className="mb-4 text-slate-600" />
+                                    <p className="text-slate-400 font-semibold">Chưa có địa chỉ nào được lưu.</p>
+                                    <p className="text-slate-600 text-sm mt-1">Nhấn "Thêm địa chỉ" để thêm ngay!</p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-20 opacity-30">
-                                    <ShoppingBag size={64} className="mb-4" />
-                                    <p>Bạn chưa có đơn hàng nào.</p>
-                                    <Link to="/" className="text-primary hover:underline mt-2">Bắt đầu mua sắm ngay</Link>
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    {localAddresses.map((addr) => (
+                                        <div
+                                            key={addr._id}
+                                            className={`relative p-5 rounded-2xl border-2 transition-all ${addr.isDefault ? 'border-primary bg-primary/5' : 'border-slate-800 hover:border-slate-700 bg-slate-900/30'}`}
+                                        >
+                                            {addr.isDefault && (
+                                                <div className="absolute top-3 right-3 flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-1">
+                                                    <Star size={10} fill="currentColor" /> Mặc định
+                                                </div>
+                                            )}
+                                            {addr.label && (
+                                                <p className="text-primary font-bold uppercase text-xs tracking-widest mb-2">{addr.label}</p>
+                                            )}
+                                            <p className="font-bold text-white text-base">{addr.name}</p>
+                                            <p className="text-slate-400 text-sm">{addr.phone}</p>
+                                            <p className="text-slate-400 text-sm mt-2 leading-relaxed">
+                                                {addr.address}, {addr.city}
+                                                {addr.country && `, ${addr.country}`}
+                                            </p>
+                                            {addr.lat && (
+                                                <p className="text-slate-600 text-[10px] mt-2 font-mono">
+                                                    📍 {addr.lat.toFixed(4)}, {addr.lng.toFixed(4)}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-2 mt-4">
+                                                {!addr.isDefault && (
+                                                    <button
+                                                        onClick={() => handleSetDefault(addr._id)}
+                                                        className="text-xs text-slate-500 hover:text-primary transition-colors font-bold flex items-center gap-1"
+                                                    >
+                                                        <Star size={12} /> Đặt mặc định
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleDeleteAddress(addr._id)}
+                                                    className="ml-auto text-slate-600 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-950/30"
+                                                >
+                                                    <Trash2 size={15} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </CardContent>
-                     </Card>
+                    </Card>
                 </div>
             </div>
+
+            {/* Add Address Modal */}
+            {showAddModal && (
+                <AddAddressModal
+                    onClose={() => setShowAddModal(false)}
+                    onSaved={handleAddressSaved}
+                />
+            )}
         </div>
     );
 };
