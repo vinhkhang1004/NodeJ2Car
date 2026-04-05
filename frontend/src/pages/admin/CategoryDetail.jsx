@@ -207,7 +207,7 @@ const CategoryDetail = () => {
                                             className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 transition-colors"
                                         >
                                             <img
-                                                src={p.imageUrl}
+                                                src={p.imageUrl?.startsWith('/') ? `http://localhost:5000${p.imageUrl}` : p.imageUrl}
                                                 alt={p.name}
                                                 className="w-10 h-10 rounded object-cover border border-slate-700"
                                                 onError={(e) => { e.target.src = 'https://placehold.co/40x40/27272a/71717a?text=?'; }}
