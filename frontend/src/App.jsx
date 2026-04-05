@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import { CartProvider } from './context/CartContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -22,6 +23,7 @@ import CategoryList from './pages/admin/CategoryList';
 import CategoryEdit from './pages/admin/CategoryEdit';
 import CategoryDetail from './pages/admin/CategoryDetail';
 
+import Cart from './pages/Cart';
 import UserList from './pages/admin/UserList';
 
 function PublicLayout() {
@@ -37,13 +39,15 @@ function PublicLayout() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <CartProvider>
+      <Router>
+        <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search/:keyword" element={<Home />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
 
         {/* Auth */}
@@ -76,7 +80,8 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </Router>
+      </Router>
+    </CartProvider>
   );
 }
 

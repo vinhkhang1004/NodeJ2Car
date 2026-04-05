@@ -3,12 +3,15 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchProductById, deleteProduct } from '../../services/productService';
 import {
     ArrowLeft, Pencil, Trash2, Loader2, Package, Tag, DollarSign,
-    Boxes, Image, Info, Calendar, User, Hash
+    Boxes, Image, Info, Calendar, User, Hash, ShoppingCart, Plus, Minus
 } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
+import { CartContext } from '../../context/CartContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getFileUrl } from '../../lib/utils';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -17,6 +20,9 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [deleting, setDeleting] = useState(false);
+    const { user } = React.useContext(AuthContext);
+    const { addToCart } = React.useContext(CartContext);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         const load = async () => {
@@ -76,22 +82,24 @@ const ProductDetail = () => {
                         <p className="text-slate-400 text-xs mt-0.5">ID: {product._id}</p>
                     </div>
                 </div>
-                <div className="flex gap-2">
-                    <Button asChild variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
-                        <Link to={`/admin/products/${product._id}/edit`}>
-                            <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
-                        </Link>
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        disabled={deleting}
-                        onClick={handleDelete}
-                        className="bg-red-950/50 border border-red-900/50 text-red-400 hover:bg-red-900/50"
-                    >
-                        {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                        Xoá sản phẩm
-                    </Button>
-                </div>
+                {(user && user.isAdmin) && (
+                    <div className="flex gap-2">
+                        <Button asChild variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
+                            <Link to={`/admin/products/${product._id}/edit`}>
+                                <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
+                            </Link>
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            disabled={deleting}
+                            onClick={handleDelete}
+                            className="bg-red-950/50 border border-red-900/50 text-red-400 hover:bg-red-900/50"
+                        >
+                            {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                            Xoá sản phẩm
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -100,7 +108,7 @@ const ProductDetail = () => {
                     <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20">
                         <CardContent className="pt-6">
                             <img
-                                src={product.imageUrl?.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl}
+                                src={getFileUrl(product.imageUrl)}
                                 alt={product.name}
                                 className="w-full aspect-square object-cover rounded-lg border border-slate-700 mb-4"
                                 onError={(e) => { e.target.src = 'https://placehold.co/400x400/27272a/71717a?text=No+Image'; }}
@@ -127,24 +135,67 @@ const ProductDetail = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Quick actions */}
-                    <Card className="bg-[#18181b] border-slate-800">
-                        <CardHeader>
-                            <CardTitle className="text-white text-sm">Thao tác nhanh</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <Button asChild className="w-full bg-white text-black hover:bg-slate-200">
-                                <Link to={`/admin/products/${product._id}/edit`}>
-                                    <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa thông tin
-                                </Link>
-                            </Button>
-                            <Button asChild variant="outline" className="w-full bg-transparent border-slate-700 text-white hover:bg-slate-800">
-                                <Link to="/admin/products/create">
-                                    <Package className="mr-2 h-4 w-4" /> Thêm sản phẩm mới
-                                </Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    {/* Public Add to Cart - only show if NOT admin or in public route */}
+                    {(!user || !user.isAdmin) && (
+                        <Card className="bg-[#18181b] border-primary/20 shadow-xl shadow-primary/5">
+                            <CardContent className="pt-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-1 bg-slate-900 rounded-xl border border-slate-800">
+                                        <button 
+                                            onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Minus size={18} />
+                                        </button>
+                                        <span className="text-xl font-bold">{quantity}</span>
+                                        <button 
+                                            onClick={() => setQuantity(q => q + 1)}
+                                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-800 transition-colors"
+                                            disabled={quantity >= product.stock}
+                                        >
+                                            <Plus size={18} />
+                                        </button>
+                                    </div>
+                                    <Button 
+                                        onClick={() => {
+                                            if (quantity > product.stock) {
+                                                alert(`Xin lỗi, chỉ có ${product.stock} sản phẩm trong kho.`);
+                                                setQuantity(product.stock);
+                                                return;
+                                            }
+                                            addToCart(product, quantity);
+                                        }}
+                                        disabled={product.stock <= 0}
+                                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:translate-y-[-2px]"
+                                    >
+                                        <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                        {product.stock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Quick actions (Admin only) */}
+                    {(user && user.isAdmin) && (
+                        <Card className="bg-[#18181b] border-slate-800">
+                            <CardHeader>
+                                <CardTitle className="text-white text-sm">Thao tác nhanh</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <Button asChild className="w-full bg-white text-black hover:bg-slate-200">
+                                    <Link to={`/admin/products/${product._id}/edit`}>
+                                        <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa thông tin
+                                    </Link>
+                                </Button>
+                                <Button asChild variant="outline" className="w-full bg-transparent border-slate-700 text-white hover:bg-slate-800">
+                                    <Link to="/admin/products/create">
+                                        <Package className="mr-2 h-4 w-4" /> Thêm sản phẩm mới
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
 
                 {/* Right — Details */}
@@ -213,11 +264,6 @@ const ProductDetail = () => {
                             <Row icon={<Calendar size={14} />} label="Cập nhật lần cuối"
                                 value={new Date(product.updatedAt).toLocaleString('vi-VN')}
                             />
-                            {product.createdBy && (
-                                <Row icon={<User size={14} />} label="Tạo bởi"
-                                    value={product.createdBy.name}
-                                />
-                            )}
                         </CardContent>
                     </Card>
                 </div>
