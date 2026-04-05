@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getFileUrl } from '../../lib/utils';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -159,10 +160,10 @@ const ProductList = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <img
-                                                    src={product.imageUrl?.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl}
+                                                    src={getFileUrl(product.imageUrl)}
                                                     alt={product.name}
                                                     className="w-10 h-10 rounded object-cover border border-slate-700"
-                                                    onError={(e) => { e.target.src = 'https://placehold.co/40x40/27272a/71717a?text=?'; }}
+                                                    onError={(e) => { e.target.src = 'https://placehold.co/40x44/27272a/71717a?text=?'; }}
                                                 />
                                                 <div>
                                                     <p className="font-medium text-white leading-tight">{product.name}</p>

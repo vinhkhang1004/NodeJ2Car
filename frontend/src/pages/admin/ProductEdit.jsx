@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getFileUrl } from '../../lib/utils';
 
 const ProductEdit = () => {
     const { id } = useParams();
@@ -313,7 +314,7 @@ const ProductEdit = () => {
                         {imageUrl && (
                             <div className="mt-4 relative inline-block">
                                 <img
-                                    src={imageUrl.startsWith('/') ? `http://localhost:5000${imageUrl}` : imageUrl}
+                                    src={getFileUrl(imageUrl)}
                                     alt="preview"
                                     className="w-32 h-32 object-cover rounded-lg border border-slate-700 shadow-md"
                                     onError={(e) => e.target.style.display = 'none'}

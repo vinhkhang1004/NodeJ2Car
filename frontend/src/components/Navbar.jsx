@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Search, LogOut, User, Menu, X, Settings } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
+import { Search, LogOut, User, Menu, X, Settings, ShoppingCart } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const { cartCount } = useContext(CartContext);
   const [keyword, setKeyword] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -73,6 +75,16 @@ const Navbar = () => {
               <Link to="/register" className="btn btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '20px' }}>Sign Up</Link>
             </div>
           )}
+
+          {/* Cart Icon */}
+          <Link to="/cart" className="relative p-2 text-slate-300 hover:text-white transition-colors">
+            <ShoppingCart size={24} />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-pulse shadow-lg shadow-primary/20">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -120,6 +132,17 @@ const Navbar = () => {
               <Link to="/register" onClick={() => setIsMenuOpen(false)} className="btn btn-primary" style={{ textAlign: 'center' }}>Sign Up</Link>
             </div>
           )}
+
+          {/* Mobile Cart Link */}
+          <Link to="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary mt-4 font-bold">
+            <div className="flex items-center gap-3">
+              <ShoppingCart size={20} />
+              <span>Shopping Cart</span>
+            </div>
+            <span className="bg-primary text-white px-2 py-0.5 rounded-full text-xs">
+              {cartCount}
+            </span>
+          </Link>
         </div>
       )}
 
