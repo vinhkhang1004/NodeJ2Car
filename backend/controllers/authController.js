@@ -84,6 +84,11 @@ const getUserProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                phone: user.phone,
+                address: user.address,
+                city: user.city,
+                country: user.country,
+                postalCode: user.postalCode,
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -103,6 +108,11 @@ const updateUserProfile = async (req, res) => {
         if (user) {
             user.name = req.body.name || user.name;
             user.email = req.body.email || user.email;
+            user.phone = req.body.phone || user.phone;
+            user.address = req.body.address || user.address;
+            user.city = req.body.city || user.city;
+            user.country = req.body.country || user.country;
+            user.postalCode = req.body.postalCode || user.postalCode;
 
             if (req.body.password) {
                 user.password = req.body.password;
@@ -115,6 +125,11 @@ const updateUserProfile = async (req, res) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 isAdmin: updatedUser.isAdmin,
+                phone: updatedUser.phone,
+                address: updatedUser.address,
+                city: updatedUser.city,
+                country: updatedUser.country,
+                postalCode: updatedUser.postalCode,
                 token: generateToken(updatedUser._id),
             });
         } else {

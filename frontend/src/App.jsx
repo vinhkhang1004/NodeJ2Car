@@ -12,6 +12,10 @@ import AdminLayout from './components/AdminLayout';
 import AuthLayout from './components/AuthLayout';
 import Dashboard from './pages/admin/Dashboard';
 import Profile from './pages/Profile';
+import Shipping from './pages/Shipping';
+import Payment from './pages/Payment';
+import PlaceOrder from './pages/PlaceOrder';
+import OrderResult from './pages/OrderResult';
 
 // Legacy parts removed
 
@@ -54,6 +58,10 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/shipping" element={<Shipping />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/placeorder" element={<PlaceOrder />} />
+            <Route path="/order-success/:id" element={<OrderResult />} />
           </Route>
         </Route>
 

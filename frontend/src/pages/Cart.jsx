@@ -118,8 +118,8 @@ const Cart = () => {
               </div>
             </div>
 
-            <Button className="w-full bg-white text-black hover:bg-slate-200 py-8 text-xl font-bold rounded-2xl shadow-xl shadow-primary/10">
-              Proceed to Checkout
+            <Button asChild className="w-full bg-white text-black hover:bg-slate-200 py-8 text-xl font-bold rounded-2xl shadow-xl shadow-primary/10 transition-transform active:scale-95">
+              <Link to="/shipping">Proceed to Checkout</Link>
             </Button>
             
             <p className="text-center text-slate-500 text-xs mt-6">
