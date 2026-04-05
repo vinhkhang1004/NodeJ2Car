@@ -8,6 +8,7 @@ const partRoutes = require('./routes/partRoutes.js');       // legacy — keep f
 const productRoutes = require('./routes/productRoutes.js'); // new full-featured
 const categoryRoutes = require('./routes/categoryRoutes.js');
 const uploadRoutes = require('./routes/uploadRoutes.js');
+const orderRoutes = require('./routes/orderRoutes.js');
 const path = require('path');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/parts', partRoutes);          // legacy route (unchanged)
 app.use('/api/products', productRoutes);    // new product CRUD with pagination & category ref
 app.use('/api/categories', categoryRoutes); // new category CRUD
 app.use('/api/upload', uploadRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.use(
     '/uploads',

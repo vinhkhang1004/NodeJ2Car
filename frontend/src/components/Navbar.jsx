@@ -62,10 +62,10 @@ const Navbar = () => {
                   Admin Dashboard
                 </Link>
               )}
-              <span className="flex items-center gap-2 text-muted">
+              <Link to="/profile" className="flex items-center gap-2 text-link hover:text-white transition-colors">
                 <User size={18} /> {user.name}
-              </span>
-              <button onClick={handleLogout} className="btn btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '20px' }}>
+              </Link>
+              <button onClick={handleLogout} className="btn bg-red-950/30 text-red-400 hover:bg-red-900/50 border border-red-900/50" style={{ padding: '0.5rem 1rem', borderRadius: '20px' }}>
                 <LogOut size={16} /> Logout
               </button>
             </div>
@@ -119,10 +119,10 @@ const Navbar = () => {
                   Admin Dashboard
                 </Link>
               )}
-              <span className="flex items-center gap-2 text-muted pb-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                <User size={18} /> {user.name}
-              </span>
-              <button onClick={handleLogout} className="flex items-center gap-2 text-error" style={{ padding: '0.5rem 0' }}>
+              <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-white pb-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                <User size={18} /> {user.name} (Tài khoản)
+              </Link>
+              <button onClick={handleLogout} className="flex items-center gap-2 text-red-400" style={{ padding: '0.5rem 0' }}>
                 <LogOut size={18} /> Logout
               </button>
             </div>

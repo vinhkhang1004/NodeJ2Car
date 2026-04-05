@@ -13,7 +13,9 @@ const { protect, admin } = require('../middleware/authMiddleware.js');
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
-router.get('/profile', protect, getUserProfile);
+router.route('/profile')
+    .get(protect, getUserProfile)
+    .put(protect, updateUserProfile);
 
 // Admin routes
 router.route('/users').get(protect, admin, getUsers);
