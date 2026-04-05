@@ -21,6 +21,26 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
+        phone: {
+            type: String,
+            default: '',
+        },
+        address: {
+            type: String,
+            default: '',
+        },
+        city: {
+            type: String,
+            default: '',
+        },
+        country: {
+            type: String,
+            default: '',
+        },
+        postalCode: {
+            type: String,
+            default: '',
+        },
     },
     {
         timestamps: true,
@@ -33,14 +53,13 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        return next();
+        return;
     }
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
 });
 
 const User = mongoose.model('User', userSchema);
