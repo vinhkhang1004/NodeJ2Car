@@ -9,7 +9,8 @@ import {
     Settings, 
     LogOut,
     HelpCircle,
-    CarFront
+    CarFront,
+    ShoppingBag
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -27,7 +28,7 @@ const AdminLayout = () => {
         { name: 'Users', icon: Users, path: '/admin/users' },
         { name: 'Sản phẩm', icon: Package, path: '/admin/products' },
         { name: 'Danh mục', icon: Tag, path: '/admin/categories' },
-
+        { name: 'Đơn hàng', icon: ShoppingBag, path: '/admin/orders' },
     ];
 
     return (

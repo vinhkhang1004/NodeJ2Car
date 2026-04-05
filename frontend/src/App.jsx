@@ -7,9 +7,11 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 
 import AdminRoute from './components/AdminRoute';
+import PrivateRoute from './components/PrivateRoute';
 import AdminLayout from './components/AdminLayout';
 import AuthLayout from './components/AuthLayout';
 import Dashboard from './pages/admin/Dashboard';
+import Profile from './pages/Profile';
 
 // Legacy parts removed
 
@@ -25,6 +27,8 @@ import CategoryDetail from './pages/admin/CategoryDetail';
 
 import Cart from './pages/Cart';
 import UserList from './pages/admin/UserList';
+import OrderList from './pages/admin/OrderList';
+import OrderInfo from './pages/admin/OrderInfo';
 
 function PublicLayout() {
   return (
@@ -48,6 +52,9 @@ function App() {
           <Route path="/search/:keyword" element={<Home />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
         </Route>
 
         {/* Auth */}
@@ -77,6 +84,10 @@ function App() {
             <Route path="/admin/categories/create" element={<CategoryEdit />} />
             <Route path="/admin/categories/:id" element={<CategoryDetail />} />
             <Route path="/admin/categories/:id/edit" element={<CategoryEdit />} />
+
+            {/* Orders */}
+            <Route path="/admin/orders" element={<OrderList />} />
+            <Route path="/admin/orders/:id" element={<OrderInfo />} />
           </Route>
         </Route>
       </Routes>
