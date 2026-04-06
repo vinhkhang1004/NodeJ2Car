@@ -84,6 +84,12 @@ const getUserProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                phone: user.phone,
+                address: user.address,
+                city: user.city,
+                country: user.country,
+                postalCode: user.postalCode,
+                addresses: user.addresses || [],
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -93,7 +99,117 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-// @desc    Get all users (Admin)
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            user.phone = req.body.phone || user.phone;
+            user.address = req.body.address || user.address;
+            user.city = req.body.city || user.city;
+            user.country = req.body.country || user.country;
+            user.postalCode = req.body.postalCode || user.postalCode;
+
+            if (req.body.password) {
+                user.password = req.body.password;
+            }
+
+            const updatedUser = await user.save();
+
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin,
+                phone: updatedUser.phone,
+                address: updatedUser.address,
+                city: updatedUser.city,
+                country: updatedUser.country,
+                postalCode: updatedUser.postalCode,
+                token: generateToken(updatedUser._id),
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Add a new address to user profile
+// @route   POST /api/auth/addresses
+// @access  Private
+const addAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const newAddress = {
+            label: req.body.label || '',
+            name: req.body.name,
+            phone: req.body.phone,
+            address: req.body.address,
+            city: req.body.city,
+            country: req.body.country || 'Việt Nam',
+            postalCode: req.body.postalCode || '',
+            lat: req.body.lat,
+            lng: req.body.lng,
+            isDefault: user.addresses.length === 0, // First address is default
+        };
+
+        user.addresses.push(newAddress);
+        await user.save();
+
+        res.status(201).json({ addresses: user.addresses });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete an address from user profile
+// @route   DELETE /api/auth/addresses/:addressId
+// @access  Private
+const deleteAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.addresses = user.addresses.filter(
+            (addr) => addr._id.toString() !== req.params.addressId
+        );
+        await user.save();
+
+        res.json({ addresses: user.addresses });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Set default address
+// @route   PUT /api/auth/addresses/:addressId/default
+// @access  Private
+const setDefaultAddress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.addresses = user.addresses.map((addr) => ({
+            ...addr.toObject(),
+            isDefault: addr._id.toString() === req.params.addressId,
+        }));
+        await user.save();
+
+        res.json({ addresses: user.addresses });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @route   GET /api/auth/users
 // @access  Private/Admin
 const getUsers = async (req, res) => {
@@ -128,6 +244,10 @@ module.exports = {
     loginUser,
     logoutUser,
     getUserProfile,
+    updateUserProfile,
+    addAddress,
+    deleteAddress,
+    setDefaultAddress,
     getUsers,
     deleteUser,
 };

@@ -5,12 +5,18 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('userInfo');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            const parsed = JSON.parse(storedUser);
+            setUser(parsed);
+            // Load addresses from backend
+            api.get('/auth/profile')
+                .then(({ data }) => setAddresses(data.addresses || []))
+                .catch(() => {});
         }
         setLoading(false);
     }, []);
@@ -34,8 +40,17 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('userInfo');
     };
 
+    const updateUserInfo = (data) => {
+        setUser(data);
+        localStorage.setItem('userInfo', JSON.stringify(data));
+    };
+
+    const updateAddresses = (newAddresses) => {
+        setAddresses(newAddresses);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, addresses, login, register, logout, updateUserInfo, updateAddresses, loading }}>
             {children}
         </AuthContext.Provider>
     );
