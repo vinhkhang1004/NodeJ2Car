@@ -5,7 +5,8 @@ import { CartProvider } from './context/CartContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-
+import PartDetail from './pages/PartDetail';
+import Shop from './pages/Shop';
 import AdminRoute from './components/AdminRoute';
 import PrivateRoute from './components/PrivateRoute';
 import AdminLayout from './components/AdminLayout';
@@ -38,7 +39,7 @@ function PublicLayout() {
   return (
     <>
       <Navbar />
-      <main className="container mt-8 animate-fade-in">
+      <main className="animate-fade-in">
         <Outlet />
       </main>
     </>
@@ -53,7 +54,9 @@ function App() {
         {/* Public */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/search/:keyword" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/search/:keyword" element={<Shop />} />
+          <Route path="/part/:id" element={<PartDetail />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route element={<PrivateRoute />}>

@@ -10,7 +10,6 @@ import {
     ShoppingBag,
     CarFront,
     ExternalLink,
-    BarChart3
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -27,7 +26,7 @@ const AdminLayout = () => {
         {
             label: 'Tổng quan',
             items: [
-                { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+                { name: 'Bảng điều khiển', icon: LayoutDashboard, path: '/admin/dashboard' },
             ]
         },
         {
@@ -36,7 +35,7 @@ const AdminLayout = () => {
                 { name: 'Sản phẩm', icon: Package, path: '/admin/products' },
                 { name: 'Danh mục', icon: Tag, path: '/admin/categories' },
                 { name: 'Đơn hàng', icon: ShoppingBag, path: '/admin/orders' },
-                { name: 'Khách hàng', icon: Users, path: '/admin/users' },
+                { name: 'Người dùng', icon: Users, path: '/admin/users' },
             ]
         },
     ];
@@ -54,7 +53,7 @@ const AdminLayout = () => {
                             </div>
                             <div>
                                 <p className="text-white font-black text-base leading-none">J2 Admin</p>
-                                <p className="text-slate-600 text-[10px] font-medium mt-0.5">Auto Parts Manager</p>
+                                <p className="text-slate-600 text-[10px] font-medium mt-0.5">Phụ tùng chính hãng</p>
                             </div>
                         </Link>
                     </div>
@@ -127,7 +126,7 @@ const AdminLayout = () => {
                     <div className="flex-1" />
                     <div className="flex items-center gap-3">
                         <span className="text-slate-500 text-xs">Xin chào,</span>
-                        <span className="text-white text-sm font-bold">{user?.name}</span>
+                        <span className="text-white text-sm font-bold">{user?.name || 'Admin'}</span>
                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     </div>
                 </div>

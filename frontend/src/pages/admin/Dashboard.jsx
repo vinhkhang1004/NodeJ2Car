@@ -9,9 +9,8 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-    AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar
+    AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts';
 
 const formatVND = (n) => {
@@ -33,8 +32,8 @@ const StatCard = ({ icon: Icon, title, value, subValue, trend, color }) => {
             <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity ${color} blur-[80px] -z-0`} />
             <CardContent className="pt-6 pb-5 relative z-10">
                 <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${color.replace('bg-', 'bg-').replace('/20', '/10')} border border-slate-800`}>
-                        <Icon size={22} className={color.includes('primary') || color.includes('orange') ? 'text-primary' : color.includes('blue') ? 'text-blue-400' : color.includes('green') ? 'text-green-400' : color.includes('purple') ? 'text-purple-400' : 'text-slate-400'} />
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-800/60 border border-slate-700`}>
+                        <Icon size={22} className="text-slate-300" />
                     </div>
                     <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg ${up ? 'text-green-400 bg-green-500/10' : 'text-red-400 bg-red-500/10'}`}>
                         {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
@@ -52,9 +51,9 @@ const StatCard = ({ icon: Icon, title, value, subValue, trend, color }) => {
 const OrderStatusBadge = ({ status }) => {
     const map = {
         'Processing': { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', icon: Clock },
-        'Shipped': { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', icon: Truck },
-        'Delivered': { color: 'bg-green-500/10 text-green-400 border-green-500/20', icon: CheckCircle },
-        'Cancelled': { color: 'bg-red-500/10 text-red-400 border-red-500/20', icon: XCircle },
+        'Shipped':    { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',       icon: Truck },
+        'Delivered':  { color: 'bg-green-500/10 text-green-400 border-green-500/20',    icon: CheckCircle },
+        'Cancelled':  { color: 'bg-red-500/10 text-red-400 border-red-500/20',          icon: XCircle },
     };
     const cfg = map[status] || { color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: Clock };
     const Icon = cfg.icon;
@@ -133,7 +132,6 @@ const AdminDashboard = () => {
     const revTrend = pct(stats?.thisMonthRevenue || 0, stats?.lastMonthRevenue || 0);
     const orderTrend = pct(stats?.thisMonthOrders || 0, stats?.lastMonthOrders || 0);
 
-    // Fill revenue chart data for last 30 days
     const chartData = (() => {
         const raw = stats?.revenueByDay || [];
         const map = {};
@@ -160,7 +158,7 @@ const AdminDashboard = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard <span className="text-primary">Admin</span></h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-white">Bảng điều khiển <span className="text-primary">Quản trị</span></h1>
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
@@ -234,31 +232,10 @@ const AdminDashboard = () => {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        tick={{ fill: '#52525b', fontSize: 11 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        interval={4}
-                                    />
-                                    <YAxis
-                                        tick={{ fill: '#52525b', fontSize: 10 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tickFormatter={(v) => v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}tr` : v}
-                                        width={40}
-                                    />
+                                    <XAxis dataKey="name" tick={{ fill: '#52525b', fontSize: 11 }} axisLine={false} tickLine={false} interval={4} />
+                                    <YAxis tick={{ fill: '#52525b', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}tr` : v} width={40} />
                                     <Tooltip content={<CustomTooltip />} />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="revenue"
-                                        stroke="#f97316"
-                                        strokeWidth={2.5}
-                                        fillOpacity={1}
-                                        fill="url(#colorRev)"
-                                        dot={false}
-                                        activeDot={{ r: 5, fill: '#f97316', stroke: '#09090b', strokeWidth: 2 }}
-                                    />
+                                    <Area type="monotone" dataKey="revenue" stroke="#f97316" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRev)" dot={false} activeDot={{ r: 5, fill: '#f97316', stroke: '#09090b', strokeWidth: 2 }} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -276,9 +253,9 @@ const AdminDashboard = () => {
                     <CardContent className="pt-5 space-y-4">
                         {[
                             { label: 'Đang xử lý', key: 'Processing', color: 'bg-yellow-500', textColor: 'text-yellow-400' },
-                            { label: 'Đang giao', key: 'Shipped', color: 'bg-blue-500', textColor: 'text-blue-400' },
-                            { label: 'Đã giao', key: 'Delivered', color: 'bg-green-500', textColor: 'text-green-400' },
-                            { label: 'Đã hủy', key: 'Cancelled', color: 'bg-red-500', textColor: 'text-red-400' },
+                            { label: 'Đang giao',  key: 'Shipped',    color: 'bg-blue-500',   textColor: 'text-blue-400'   },
+                            { label: 'Đã giao',    key: 'Delivered',  color: 'bg-green-500',  textColor: 'text-green-400'  },
+                            { label: 'Đã hủy',     key: 'Cancelled',  color: 'bg-red-500',    textColor: 'text-red-400'    },
                         ].map(({ label, key, color, textColor }) => {
                             const val = statusMap[key] || 0;
                             const total = stats?.totalOrders || 1;
@@ -290,10 +267,7 @@ const AdminDashboard = () => {
                                         <span className={`font-bold text-sm ${textColor}`}>{val}</span>
                                     </div>
                                     <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full rounded-full ${color}`}
-                                            style={{ width: `${pctVal}%`, transition: 'width 1s ease' }}
-                                        />
+                                        <div className={`h-full rounded-full ${color}`} style={{ width: `${pctVal}%`, transition: 'width 1s ease' }} />
                                     </div>
                                 </div>
                             );
@@ -304,10 +278,7 @@ const AdminDashboard = () => {
                         )}
 
                         <div className="pt-2">
-                            <Link
-                                to="/admin/orders"
-                                className="flex items-center justify-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors"
-                            >
+                            <Link to="/admin/orders" className="flex items-center justify-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
                                 Xem tất cả đơn hàng <ArrowRight size={14} />
                             </Link>
                         </div>
@@ -323,12 +294,7 @@ const AdminDashboard = () => {
                             <CardTitle className="text-white text-lg">Đơn hàng gần đây</CardTitle>
                             <CardDescription className="text-slate-500">5 đơn hàng mới nhất</CardDescription>
                         </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate('/admin/orders')}
-                            className="border-slate-700 bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl"
-                        >
+                        <Button variant="outline" size="sm" onClick={() => navigate('/admin/orders')} className="border-slate-700 bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl">
                             Xem tất cả <ArrowRight size={14} className="ml-1" />
                         </Button>
                     </div>
@@ -355,31 +321,18 @@ const AdminDashboard = () => {
                                 <tbody className="divide-y divide-slate-800/50">
                                     {stats.recentOrders.map((order) => (
                                         <tr key={order._id} className="hover:bg-slate-800/20 transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-xs text-slate-400">
-                                                #{order._id.slice(-8).toUpperCase()}
-                                            </td>
+                                            <td className="px-6 py-4 font-mono text-xs text-slate-400">#{order._id.slice(-8).toUpperCase()}</td>
                                             <td className="px-6 py-4">
                                                 <div>
                                                     <p className="text-white font-medium">{order.user?.name || 'N/A'}</p>
                                                     <p className="text-slate-500 text-xs">{order.user?.email || ''}</p>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-center font-bold text-primary">
-                                                {order.totalPrice?.toLocaleString('vi-VN')}₫
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <OrderStatusBadge status={order.status} />
-                                            </td>
-                                            <td className="px-6 py-4 text-center text-slate-400 text-xs">
-                                                {new Date(order.createdAt).toLocaleDateString('vi-VN')}
-                                            </td>
+                                            <td className="px-6 py-4 text-center font-bold text-primary">{order.totalPrice?.toLocaleString('vi-VN')}₫</td>
+                                            <td className="px-6 py-4 text-center"><OrderStatusBadge status={order.status} /></td>
+                                            <td className="px-6 py-4 text-center text-slate-400 text-xs">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
                                             <td className="px-6 py-4 text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => navigate(`/admin/orders`)}
-                                                    className="text-slate-500 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all rounded-xl"
-                                                >
+                                                <Button variant="ghost" size="sm" onClick={() => navigate('/admin/orders')} className="text-slate-500 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all rounded-xl">
                                                     Chi tiết <ArrowRight size={14} className="ml-1" />
                                                 </Button>
                                             </td>
@@ -395,10 +348,10 @@ const AdminDashboard = () => {
             {/* Quick Actions */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                    { label: 'Thêm sản phẩm', icon: Package, to: '/admin/products/create', color: 'from-primary/20 to-primary/5' },
-                    { label: 'Quản lý đơn hàng', icon: ShoppingBag, to: '/admin/orders', color: 'from-blue-500/20 to-blue-500/5' },
-                    { label: 'Quản lý sản phẩm', icon: Package, to: '/admin/products', color: 'from-purple-500/20 to-purple-500/5' },
-                    { label: 'Quản lý danh mục', icon: BarChart3, to: '/admin/categories', color: 'from-green-500/20 to-green-500/5' },
+                    { label: 'Thêm sản phẩm',    icon: Package,     to: '/admin/products/create', color: 'from-primary/20 to-primary/5'      },
+                    { label: 'Quản lý đơn hàng', icon: ShoppingBag, to: '/admin/orders',           color: 'from-blue-500/20 to-blue-500/5'    },
+                    { label: 'Quản lý sản phẩm', icon: Package,     to: '/admin/products',         color: 'from-purple-500/20 to-purple-500/5' },
+                    { label: 'Quản lý danh mục', icon: BarChart3,   to: '/admin/categories',       color: 'from-green-500/20 to-green-500/5'  },
                 ].map(({ label, icon: Icon, to, color }) => (
                     <Link
                         key={to}
