@@ -3,6 +3,7 @@ const AutoPart = require('../models/AutoPart.js');
 // @desc    Fetch all auto parts with optional search, filter, pagination
 // @route   GET /api/products
 // @access  Public
+// ..
 const getProducts = async (req, res) => {
     try {
         const { keyword, category, brand, minPrice, maxPrice, page = 1, limit = 12 } = req.query;
