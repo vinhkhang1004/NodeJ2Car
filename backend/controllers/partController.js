@@ -5,6 +5,9 @@ const AutoPart = require('../models/AutoPart.js');
 // @access  Public
 const getParts = async (req, res) => {
     try {
+        const pageSize = Number(req.query.limit) || 12;
+        const page = Number(req.query.page) || 1;
+
         const keyword = req.query.keyword
             ? {
                   name: {
@@ -14,8 +17,27 @@ const getParts = async (req, res) => {
               }
             : {};
 
-        const parts = await AutoPart.find({ ...keyword });
-        res.json(parts);
+        const category = req.query.category ? { category: req.query.category } : {};
+        const brand = req.query.brand ? { brand: req.query.brand } : {};
+        
+        const minPrice = Number(req.query.minPrice) || 0;
+        const maxPrice = Number(req.query.maxPrice) || Infinity;
+        const priceFilter = { price: { $gte: minPrice, $lte: maxPrice === Infinity ? 1000000000 : maxPrice } };
+
+        const query = { ...keyword, ...category, ...brand, ...priceFilter };
+
+        const count = await AutoPart.countDocuments(query);
+        const parts = await AutoPart.find(query)
+            .limit(pageSize)
+            .skip(pageSize * (page - 1))
+            .sort({ createdAt: -1 });
+
+        res.json({
+            parts,
+            page,
+            pages: Math.ceil(count / pageSize),
+            total: count
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

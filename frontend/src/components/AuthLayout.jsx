@@ -18,8 +18,8 @@ const AuthLayout = () => {
             </div>
             
             <div className="relative z-10 w-full max-w-md mx-auto">
-                <h1 className="text-5xl lg:text-6xl font-black italic tracking-tighter mb-6 text-white drop-shadow-2xl">
-                    DIGITAL<span className="font-sans font-black tracking-normal ml-1">ENGINEER</span>
+                <h1 className="text-5xl lg:text-6xl font-black tracking-tighter mb-6 text-white drop-shadow-2xl">
+                    J2<span className="text-orange-500">Car</span>
                 </h1>
                 <p className="text-blue-100/80 text-base md:text-lg mb-16 leading-relaxed">
                     Kỹ thuật chính xác gặp gỡ hiệu suất vượt trội. Truy cập vào kho phụ tùng cao cấp dành cho những chuyên gia hàng đầu.
@@ -56,7 +56,7 @@ const AuthLayout = () => {
       <footer className="bg-[#f8fafc] border-t border-slate-200 py-16 px-8 relative z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12">
             <div className="md:col-span-1">
-                <h3 className="font-black text-slate-900 mb-4 text-base">Digital Engineer</h3>
+                <h3 className="font-black text-slate-900 mb-4 text-base">J2<span className="text-orange-500">Car</span></h3>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
                     Precision parts for technical excellence in the automotive industry.
                 </p>
@@ -84,7 +84,7 @@ const AuthLayout = () => {
             </div>
         </div>
         <div className="max-w-7xl mx-auto pt-8 border-t border-slate-200 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            © 2024 DIGITAL ENGINEER PRECISION PARTS. ALL RIGHTS RESERVED.
+            © 2024 J2CAR PRECISION PARTS. ALL RIGHTS RESERVED.
         </div>
       </footer>
     </div>
