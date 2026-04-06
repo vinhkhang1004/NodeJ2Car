@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { CartContext } from '../context/CartContext';
 import { 
     Loader2, 
     ChevronRight, 
@@ -20,6 +21,8 @@ const PartDetail = () => {
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState(0);
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { addToCart } = useContext(CartContext);
 
     useEffect(() => {
         const fetchPart = async () => {
@@ -59,8 +62,9 @@ const PartDetail = () => {
         </div>
     );
 
-    const vndPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(part.price * 25000);
-    const discountPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(part.price * 25000 * 0.88);
+    // Hiển thị giá thật theo db, tạo mức giá gốc ảo (cộng 12%) để hiển thị nhãn giảm giá cho đẹp
+    const vndPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format((part.price || 0) * 1.12);
+    const discountPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(part.price || 0);
 
     return (
         <div className="bg-white pb-24">
@@ -145,11 +149,11 @@ const PartDetail = () => {
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <button className="py-5 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl shadow-orange-500/30">
+                                <button onClick={() => { addToCart(part); navigate('/cart'); }} className="py-5 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl shadow-orange-500/30 w-full">
                                     Mua Ngay
                                 </button>
-                                <button className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200">
-                                    Thêm Giỏ Hàng
+                                <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200 w-full flex items-center justify-center gap-2">
+                                    <ShoppingCart size={16} /> Thêm Giỏ Hàng
                                 </button>
                             </div>
                             <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest uppercase tracking-widest">

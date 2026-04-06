@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, ArrowUpRight } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
 
 const PartCard = ({ part }) => {
-  // Format price to VND style as in the image
+  const { addToCart } = useContext(CartContext);
+  // Format price to VND style
   const formattedPrice = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
-  }).format(part.price * 25000); // Assuming price in USD, converting to VND for the look
+  }).format(part.price || 0); 
 
   return (
     <div className="group relative bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-2">
@@ -60,7 +62,7 @@ const PartCard = ({ part }) => {
         </div>
 
         {/* CTA Button */}
-        <button className="mt-6 w-full py-4 bg-[#f97316] hover:bg-[#ea580c] text-white flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] transition-all rounded-sm shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40">
+        <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="mt-6 w-full py-4 bg-[#f97316] hover:bg-[#ea580c] text-white flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] transition-all rounded-sm shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40">
           <ShoppingCart size={16} /> Thêm vào giỏ
         </button>
       </div>
