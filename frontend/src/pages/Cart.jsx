@@ -12,10 +12,10 @@ const Cart = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <ShoppingCart size={80} className="text-slate-700 mb-6 opacity-20" />
-        <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-        <p className="text-slate-400 mb-8 text-lg">Looks like you haven't added anything to your cart yet.</p>
+        <h2 className="text-2xl font-bold mb-2">Giỏ hàng của bạn đang trống</h2>
+        <p className="text-slate-400 mb-8 text-lg">Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
         <Button asChild className="bg-white text-black hover:bg-slate-200 px-8 py-6 text-lg font-semibold">
-          <Link to="/">Start Shopping</Link>
+          <Link to="/">Bắt đầu mua sắm</Link>
         </Button>
       </div>
     );
@@ -26,12 +26,12 @@ const Cart = () => {
       <div className="flex items-center gap-4 mb-8">
         <Button variant="ghost" asChild className="p-0 hover:bg-transparent text-slate-400 hover:text-white transition-colors">
           <Link to="/" className="flex items-center gap-2">
-            <ArrowLeft size={20} /> Back to Shop
+            <ArrowLeft size={20} /> Quay lại gian hàng
           </Link>
         </Button>
       </div>
 
-      <h1 className="text-4xl font-bold mb-10 tracking-tight">Shopping <span className="text-primary">Cart</span></h1>
+      <h1 className="text-4xl font-bold mb-10 tracking-tight">Giỏ <span className="text-primary">Hàng</span></h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-6">
@@ -48,7 +48,7 @@ const Cart = () => {
               
               <div className="flex-grow text-center sm:text-left">
                 <h3 className="text-xl font-bold mb-1 line-clamp-1">{item.name}</h3>
-                <p className="text-slate-400 text-sm mb-4">{item.category?.name || 'Uncategorized'}</p>
+                <p className="text-slate-400 text-sm mb-4">{item.category?.name || 'Chưa phân loại'}</p>
                 <div className="flex items-center justify-center sm:justify-start gap-4">
                   <div className="flex items-center bg-slate-900/50 rounded-full border border-slate-800 p-1">
                     <button 
@@ -90,26 +90,26 @@ const Cart = () => {
                onClick={clearCart}
                className="border-slate-800 text-slate-400 hover:bg-error/10 hover:text-error transition-colors"
              >
-               Clear Cart
+               Xóa giỏ hàng
              </Button>
           </div>
         </div>
 
         <div className="lg:col-span-1">
           <div className="glass-card p-8 sticky top-24 border-primary/20 bg-primary/5">
-            <h2 className="text-2xl font-bold mb-6">Order <span className="text-primary">Summary</span></h2>
+            <h2 className="text-2xl font-bold mb-6">Tóm tắt <span className="text-primary">đơn hàng</span></h2>
             
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-slate-400">
-                <span>Subtotal</span>
+                <span>Tạm tính</span>
                 <span className="font-mono font-medium text-white">{cartTotal.toLocaleString('vi-VN')}₫</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Shipping</span>
-                <span className="text-success font-medium">Free</span>
+                <span>Giao hàng</span>
+                <span className="text-success font-medium">Miễn phí</span>
               </div>
               <div className="pt-4 border-t border-slate-800 flex justify-between items-end">
-                <span className="font-bold text-lg">Total</span>
+                <span className="font-bold text-lg">Tổng tiền</span>
                 <div className="text-right">
                   <div className="text-3xl font-mono font-bold text-primary">
                     {cartTotal.toLocaleString('vi-VN')}₫
@@ -119,11 +119,11 @@ const Cart = () => {
             </div>
 
             <Button asChild className="w-full bg-white text-black hover:bg-slate-200 py-8 text-xl font-bold rounded-2xl shadow-xl shadow-primary/10 transition-transform active:scale-95">
-              <Link to="/shipping">Proceed to Checkout</Link>
+              <Link to="/shipping">Tiến hành thanh toán</Link>
             </Button>
             
             <p className="text-center text-slate-500 text-xs mt-6">
-              Tax included. Shipping calculated at checkout.
+              Đã bao gồm thuế. Phí vận chuyển sẽ được tính ở bước tiếp theo.
             </p>
           </div>
         </div>
