@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, ArrowUpRight } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
+import { getFileUrl } from '../lib/utils';
 
 const PartCard = ({ part }) => {
   const { addToCart } = useContext(CartContext);
@@ -23,9 +24,10 @@ const PartCard = ({ part }) => {
       {/* Image Container */}
       <div className="relative h-64 overflow-hidden bg-slate-50">
         <img 
-          src={part.imageUrl} 
+          src={getFileUrl(part.imageUrl)} 
           alt={part.name} 
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={(e) => { e.target.src = 'https://placehold.co/400x400/27272a/71717a?text=No+Image'; }}
         />
         <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/5 transition-colors duration-500" />
         

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { CartContext } from '../context/CartContext';
+import { getFileUrl } from '../lib/utils';
 import { 
     Loader2, 
     ChevronRight, 
@@ -42,7 +43,7 @@ const PartDetail = () => {
 
     // Mock images for gallery effect
     const galleryItems = [
-        part.imageUrl,
+        getFileUrl(part.imageUrl),
         "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?q=80&w=800&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=800&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop"
