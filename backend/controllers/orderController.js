@@ -1,5 +1,7 @@
 const Order = require('../models/Order.js');
 const AutoPart = require('../models/AutoPart.js');
+const sendEmail = require('../utils/sendEmail.js');
+
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -27,7 +29,11 @@ const addOrderItems = async (req, res) => {
                 _id: undefined,
             })),
             user: req.user._id,
-            shippingAddress,
+            shippingAddress: {
+                ...shippingAddress,
+                country: shippingAddress.country || 'Việt Nam',
+            },
+
             paymentMethod,
             itemsPrice,
             taxPrice,
@@ -139,14 +145,50 @@ const updateOrderStatus = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (order) {
+        const oldStatus = order.status;
         order.status = req.body.status || order.status;
         const updatedOrder = await order.save();
+
+        // Send email if status changed
+        if (oldStatus !== updatedOrder.status) {
+            const recipientEmail = updatedOrder.shippingAddress.email;
+            const recipientName = updatedOrder.shippingAddress.name;
+            const statusLabels = {
+                'Processing': 'Đang xử lý',
+                'Shipped': 'Đang vận chuyển',
+                'Delivered': 'Đã giao hàng',
+                'Cancelled': 'Đã hủy'
+            };
+
+            await sendEmail({
+                email: recipientEmail,
+                subject: `Cập nhật trạng thái đơn hàng #${updatedOrder._id}`,
+                message: `Xin chào ${recipientName}, trạng thái đơn hàng #${updatedOrder._id} của bạn đã được cập nhật thành: ${statusLabels[updatedOrder.status] || updatedOrder.status}.`,
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; color: #1e293b; background-color: #f8fafc;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <h2 style="color: #0f172a; margin-bottom: 24px;">Thông báo cập nhật đơn hàng</h2>
+                            <p>Xin chào <strong>${recipientName}</strong>,</p>
+                            <p>Chúng tôi xin thông báo trạng thái đơn hàng <strong>#${updatedOrder._id}</strong> của bạn đã thay đổi:</p>
+                            <div style="display: inline-block; padding: 12px 24px; background-color: #f97316; color: white; border-radius: 8px; font-weight: bold; margin: 20px 0;">
+                                ${statusLabels[updatedOrder.status] || updatedOrder.status}
+                            </div>
+                            <p>Cảm ơn bạn đã tin tưởng và lựa chọn J2AutoParts.</p>
+                            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+                            <p style="font-size: 12px; color: #64748b;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                        </div>
+                    </div>
+                `
+            });
+        }
+
         res.json(updatedOrder);
     } else {
         res.status(404);
         throw new Error('Order not found');
     }
 };
+
 
 // @desc    Get admin dashboard stats (orders + revenue)
 // @route   GET /api/orders/dashboard
