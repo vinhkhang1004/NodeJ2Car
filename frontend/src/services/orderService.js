@@ -23,3 +23,25 @@ export const fetchMyOrders = async () => {
 export const createOrder = async (orderData) => {
     return await api.post('/orders', orderData);
 };
+
+export const exportOrders = async () => {
+  const response = await api.get('/orders/export/orders', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'orders.xlsx');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+export const exportRevenue = async () => {
+  const response = await api.get('/orders/export/revenue', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'revenue.xlsx');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};

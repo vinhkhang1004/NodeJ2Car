@@ -9,6 +9,8 @@ const {
     getOrders,
     updateOrderStatus,
     getDashboardStats,
+    exportOrders,
+    exportRevenue
 } = require('../controllers/orderController.js');
 const { protect, admin } = require('../middleware/authMiddleware.js');
 
@@ -35,5 +37,8 @@ router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
 
 // @route   PUT /api/orders/:id/status
 router.route('/:id/status').put(protect, admin, updateOrderStatus);
+
+router.get('/export/orders', protect, admin, exportOrders);
+router.get('/export/revenue', protect, admin, exportRevenue);
 
 module.exports = router;

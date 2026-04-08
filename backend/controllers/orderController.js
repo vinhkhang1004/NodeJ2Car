@@ -1,7 +1,7 @@
 const Order = require('../models/Order.js');
 const AutoPart = require('../models/AutoPart.js');
 const sendEmail = require('../utils/sendEmail.js');
-
+const { generateExcel } = require('../utils/excel.js');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -262,6 +262,68 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+// Xuất danh sách hóa đơn (Orders)
+const exportOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate('user', 'name email')
+      .populate('orderItems.product', 'name sku')
+      .sort({ createdAt: -1 });
+
+    // Chuẩn bị dữ liệu cho Excel
+    const excelData = orders.map(order => ({
+      'Mã đơn': order._id,
+      'Khách hàng': order.user?.name || 'N/A',
+      'Email': order.user?.email || 'N/A',
+      'Tổng tiền': order.totalPrice,
+      'Trạng thái': order.orderStatus,
+      'Ngày tạo': order.createdAt.toLocaleDateString('vi-VN'),
+      'Sản phẩm': order.orderItems.map(item => `${item.product?.name} (x${item.qty})`).join(', ')
+    }));
+
+    const { buffer, fileName } = generateExcel(excelData, 'Hóa đơn', 'orders.xlsx');
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Xuất doanh thu (Revenue)
+const exportRevenue = async (req, res) => {
+  try {
+    // Tính doanh thu theo tháng (ví dụ: tổng doanh thu từ orders đã giao)
+    const revenueData = await Order.aggregate([
+      { $match: { orderStatus: 'Delivered' } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+          totalRevenue: { $sum: '$totalPrice' },
+          orderCount: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id': -1 } }
+    ]);
+
+    // Chuẩn bị dữ liệu cho Excel
+    const excelData = revenueData.map(item => ({
+      'Tháng': item._id,
+      'Tổng doanh thu': item.totalRevenue,
+      'Số đơn hàng': item.orderCount
+    }));
+
+    const { buffer, fileName } = generateExcel(excelData, 'Doanh thu', 'revenue.xlsx');
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
     addOrderItems,
     getOrderById,
@@ -271,4 +333,6 @@ module.exports = {
     getOrders,
     updateOrderStatus,
     getDashboardStats,
+    exportOrders,
+    exportRevenue,
 };
