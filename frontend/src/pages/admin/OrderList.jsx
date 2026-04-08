@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
 import { fetchOrders } from '../../services/orderService';
 import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { exportToExcel } from '../../lib/exportExcel';
-=======
-import { fetchOrders, exportOrders } from '../../services/orderService';
-import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
->>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,34 +27,24 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
-<<<<<<< HEAD
     const handleExportOrders = () => {
         const dataToExport = orders.map(order => ({
-            'ID Đơn hàng': order._id,
-            'Khách hàng': order.shippingAddress?.name || order.user?.name || 'Ẩn danh',
-            'Số điện thoại': order.shippingAddress?.phone || '',
-            'Địa chỉ': `${order.shippingAddress?.address}, ${order.shippingAddress?.city}`,
-            'Ngày đặt': new Date(order.createdAt).toLocaleDateString('vi-VN'),
-            'Tổng tiền': order.totalPrice,
-            'Trạng thái': order.status === 'Processing' ? 'Đang xử lý' : 
-                         order.status === 'Shipped' ? 'Đang giao' :
-                         order.status === 'Delivered' ? 'Đã giao' : 
-                         order.status === 'Cancelled' ? 'Đã hủy' : order.status,
-            'Thanh toán': order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'
+            'ID Don hang': order._id,
+            'Khach hang': order.shippingAddress?.name || order.user?.name || 'An danh',
+            'So dien thoai': order.shippingAddress?.phone || '',
+            'Dia chi': `${order.shippingAddress?.address}, ${order.shippingAddress?.city}`,
+            'Ngay dat': new Date(order.createdAt).toLocaleDateString('vi-VN'),
+            'Tong tien': order.totalPrice,
+            'Trang thai': order.status === 'Processing' ? 'Dang xu ly' :
+                         order.status === 'Shipped' ? 'Dang giao' :
+                         order.status === 'Delivered' ? 'Da giao' :
+                         order.status === 'Cancelled' ? 'Da huy' : order.status,
+            'Thanh toan': order.isPaid ? 'Da thanh toan' : 'Chua thanh toan'
         }));
 
         exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
     };
 
-=======
-    const handleExportOrders = async () => {
-        try {
-            await exportOrders();
-        } catch (error) {
-            console.error('Lỗi xuất file:', error);
-        }
-    };
->>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
@@ -84,21 +69,15 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
-<<<<<<< HEAD
                 <div className="flex gap-2">
-                    <Button 
-                        onClick={handleExportOrders} 
-                        variant="outline" 
+                    <Button
+                        onClick={handleExportOrders}
+                        variant="outline"
                         className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10"
                     >
                         <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel Đơn Hàng
                     </Button>
                 </div>
-=======
-                <Button onClick={handleExportOrders} variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
-                    Xuất Hóa Đơn Excel
-                </Button>
->>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
             </div>
 
             {error && (
