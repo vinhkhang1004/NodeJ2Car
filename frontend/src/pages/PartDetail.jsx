@@ -15,7 +15,8 @@ import {
     ArrowLeft,
     Check,
     Pencil,
-    Trash2
+    Trash2,
+    Heart
 } from 'lucide-react';
 
 const PartDetail = () => {
@@ -26,7 +27,9 @@ const PartDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
-    const { user } = useContext(AuthContext);
+    const { user, wishlist, toggleWishlist } = useContext(AuthContext);
+
+    const isFavorite = wishlist.includes(id);
 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -228,9 +231,20 @@ const PartDetail = () => {
                                 <button onClick={() => { addToCart(part); navigate('/cart'); }} className="py-5 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl shadow-orange-500/30 w-full">
                                     Mua Ngay
                                 </button>
-                                <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200 w-full flex items-center justify-center gap-2">
-                                    <ShoppingCart size={16} /> Thêm Giỏ Hàng
-                                </button>
+                                <div className="flex gap-2">
+                                    <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200 flex-grow flex items-center justify-center gap-2">
+                                        <ShoppingCart size={16} /> Thêm Giỏ Hàng
+                                    </button>
+                                    {user && (
+                                        <button 
+                                            onClick={() => toggleWishlist(part._id)}
+                                            className="w-16 bg-slate-50 border border-slate-200 flex items-center justify-center transition-all hover:bg-white group"
+                                            title={isFavorite ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
+                                        >
+                                            <Heart className={`transition-all duration-300 ${isFavorite ? 'fill-red-500 text-red-500 scale-110' : 'text-slate-400 group-hover:text-red-400'}`} size={20} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
                                 Giao hàng miễn phí toàn quốc trong 24h
