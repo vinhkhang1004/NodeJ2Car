@@ -11,11 +11,11 @@ import {
     ShoppingCart, 
     Zap, 
     ShieldCheck, 
-    Wrench,
-    CheckCircle2,
     Info,
     ArrowLeft,
-    Check
+    Check,
+    Pencil,
+    Trash2
 } from 'lucide-react';
 
 const PartDetail = () => {
@@ -33,6 +33,11 @@ const PartDetail = () => {
     const [reviewLoading, setReviewLoading] = useState(false);
     const [reviewError, setReviewError] = useState('');
     const [reviewSuccess, setReviewSuccess] = useState(false);
+
+    // Edit review states
+    const [editingReviewId, setEditingReviewId] = useState(null);
+    const [editRating, setEditRating] = useState(0);
+    const [editComment, setEditComment] = useState('');
 
 
     const fetchPart = async () => {
@@ -56,7 +61,7 @@ const PartDetail = () => {
         e.preventDefault();
         setReviewLoading(true);
         try {
-            await api.post(`/parts/${id}/reviews`, { rating, comment });
+            await api.post(`/products/${id}/reviews`, { rating, comment });
             setReviewSuccess(true);
             setRating(0);
             setComment('');
@@ -66,6 +71,40 @@ const PartDetail = () => {
         } finally {
             setReviewLoading(false);
         }
+    };
+
+    const deleteReviewHandler = async (reviewId) => {
+        if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
+            try {
+                await api.delete(`/products/${id}/reviews/${reviewId}`);
+                fetchPart();
+            } catch (err) {
+                alert(err.response?.data?.message || err.message);
+            }
+        }
+    };
+
+    const updateReviewHandler = async (e, reviewId) => {
+        e.preventDefault();
+        setReviewLoading(true);
+        try {
+            await api.put(`/products/${id}/reviews/${reviewId}`, { 
+                rating: editRating, 
+                comment: editComment 
+            });
+            setEditingReviewId(null);
+            fetchPart();
+        } catch (err) {
+            setReviewError(err.response?.data?.message || err.message);
+        } finally {
+            setReviewLoading(false);
+        }
+    };
+
+    const startEditing = (review) => {
+        setEditingReviewId(review._id);
+        setEditRating(review.rating);
+        setEditComment(review.comment);
     };
 
 
@@ -283,38 +322,107 @@ const PartDetail = () => {
                                 <div className="space-y-6">
                                     {part.reviews?.map((review) => (
                                         <div key={review._id} className="p-8 border border-slate-100 rounded-sm hover:border-slate-200 transition-colors group">
-                                            <div className="flex justify-between items-start mb-6">
-                                                <div>
-                                                    <p className="text-sm font-black text-blue-950 uppercase tracking-tighter mb-1">{review.name}</p>
-                                                    <Rating value={review.rating} />
-                                                </div>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                    {new Date(review.createdAt).toLocaleDateString('vi-VN')}
-                                                </span>
-                                            </div>
-                                            <p className="text-slate-500 text-sm leading-relaxed italic mb-4">
-                                                "{review.comment}"
-                                            </p>
-
-                                            {review.reply && (
-                                                <div className="mt-4 flex gap-3 bg-blue-50/50 p-6 rounded-sm border-l-2 border-orange-500">
-                                                    <div className="shrink-0 mt-1">
-                                                        <Check size={14} className="text-orange-500" />
+                                            {editingReviewId === review._id ? (
+                                                <form onSubmit={(e) => updateReviewHandler(e, review._id)} className="space-y-4">
+                                                    <div>
+                                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Số sao mới</label>
+                                                        <select 
+                                                            value={editRating} 
+                                                            onChange={(e) => setEditRating(e.target.value)}
+                                                            className="w-full bg-white border border-slate-200 p-3 text-xs font-bold text-blue-950 rounded-sm outline-none focus:border-blue-950 transition-colors"
+                                                            required
+                                                        >
+                                                            <option value="1">1 - Rất tệ</option>
+                                                            <option value="2">2 - Tệ</option>
+                                                            <option value="3">3 - Bình thường</option>
+                                                            <option value="4">4 - Tốt</option>
+                                                            <option value="5">5 - Rất tuyệt vời</option>
+                                                        </select>
                                                     </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black text-blue-950 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                            Phản hồi từ J2AutoParts
-                                                            <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                                            <span className="text-slate-400 font-bold lowercase">Official</span>
-                                                        </p>
-                                                        <p className="text-slate-600 text-xs leading-relaxed font-medium">
-                                                            {review.reply}
-                                                        </p>
+                                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Bình luận mới</label>
+                                                        <textarea 
+                                                            rows="4" 
+                                                            value={editComment}
+                                                            onChange={(e) => setEditComment(e.target.value)}
+                                                            className="w-full bg-white border border-slate-200 p-4 text-xs font-medium text-slate-600 rounded-sm outline-none focus:border-blue-950 transition-colors resize-none"
+                                                            required
+                                                        ></textarea>
                                                     </div>
-                                                </div>
+                                                    <div className="flex gap-2">
+                                                        <button 
+                                                            type="submit" 
+                                                            className="bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest px-6 py-3 hover:bg-blue-900 transition-colors"
+                                                        >
+                                                            Lưu thay đổi
+                                                        </button>
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => setEditingReviewId(null)}
+                                                            className="bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest px-6 py-3 hover:bg-slate-200 transition-colors"
+                                                        >
+                                                            Hủy
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            ) : (
+                                                <>
+                                                    <div className="flex justify-between items-start mb-6">
+                                                        <div>
+                                                            <p className="text-sm font-black text-blue-950 uppercase tracking-tighter mb-1">{review.name}</p>
+                                                            <Rating value={review.rating} />
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-2">
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                                {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                                            </span>
+                                                            
+                                                            {user && (review.user === user._id || user.isAdmin) && (
+                                                                <div className="flex gap-3 mt-2">
+                                                                    {review.user === user._id && !review.reply && (
+                                                                        <button 
+                                                                            onClick={() => startEditing(review)}
+                                                                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                                                                            title="Sửa đánh giá"
+                                                                        >
+                                                                            <Pencil size={14} />
+                                                                        </button>
+                                                                    )}
+                                                                    <button 
+                                                                        onClick={() => deleteReviewHandler(review._id)}
+                                                                        className="text-red-500 hover:text-red-700 transition-colors"
+                                                                        title="Xóa đánh giá"
+                                                                    >
+                                                                        <Trash2 size={14} />
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-slate-500 text-sm leading-relaxed italic mb-4">
+                                                        "{review.comment}"
+                                                    </p>
+
+                                                    {review.reply && (
+                                                        <div className="mt-4 flex gap-3 bg-blue-50/50 p-6 rounded-sm border-l-2 border-orange-500">
+                                                            <div className="shrink-0 mt-1">
+                                                                <Check size={14} className="text-orange-500" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] font-black text-blue-950 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                                    Phản hồi từ J2AutoParts
+                                                                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                                    <span className="text-slate-400 font-bold lowercase">Official</span>
+                                                                </p>
+                                                                <p className="text-slate-600 text-xs leading-relaxed font-medium">
+                                                                    {review.reply}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
-
                                     ))}
                                 </div>
                             )}
