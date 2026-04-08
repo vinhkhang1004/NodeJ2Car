@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { exportRevenue } from '../../services/orderService';
 import {
     Plus, Package, Users, ShoppingBag, DollarSign,
     TrendingUp, TrendingDown, ArrowRight, Loader2,
@@ -104,6 +105,14 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
+    const handleExportRevenue = async () => {
+        try {
+            await exportRevenue();
+        } catch (error) {
+            console.error('Lỗi xuất file:', error);
+        }
+    };
+
     if (loading) return (
         <div className="flex justify-center items-center min-h-[60vh]">
             <div className="text-center space-y-4">
@@ -162,6 +171,9 @@ const AdminDashboard = () => {
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
+                    <Button onClick={handleExportRevenue} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
+                        <BarChart3 size={16} className="mr-2" /> Xuất Báo Cáo Doanh Thu
+                    </Button>
                     <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <ShoppingBag size={16} className="mr-2" /> Đơn hàng
                     </Button>

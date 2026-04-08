@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchOrders } from '../../services/orderService';
+import { fetchOrders, exportOrders } from '../../services/orderService';
 import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,13 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
+    const handleExportOrders = async () => {
+        try {
+            await exportOrders();
+        } catch (error) {
+            console.error('Lỗi xuất file:', error);
+        }
+    };
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
@@ -50,6 +57,9 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
+                <Button onClick={handleExportOrders} variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
+                    Xuất Hóa Đơn Excel
+                </Button>
             </div>
 
             {error && (
