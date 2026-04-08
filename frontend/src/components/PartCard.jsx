@@ -17,7 +17,7 @@ const PartCard = ({ part }) => {
       {/* Category Badge */}
       <div className="absolute top-4 left-4 z-10">
         <span className="px-3 py-1 bg-blue-900/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-sm">
-          {part.category}
+          {typeof part.category === 'object' ? part.category?.name : part.category || 'Linh kiện'}
         </span>
       </div>
 
@@ -27,7 +27,7 @@ const PartCard = ({ part }) => {
           src={getFileUrl(part.imageUrl)} 
           alt={part.name} 
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          onError={(e) => { e.target.src = 'https://placehold.co/400x400/27272a/71717a?text=No+Image'; }}
+          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=400&auto=format&fit=crop'; }}
         />
         <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/5 transition-colors duration-500" />
         

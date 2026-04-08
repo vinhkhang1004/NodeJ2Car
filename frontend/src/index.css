@@ -216,3 +216,20 @@ button {
   top: 0;
   z-index: 100;
 }
+
+.premium-card {
+  @apply bg-white border border-slate-100 rounded-2xl transition-all duration-300;
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+.premium-card:hover {
+  @apply border-orange-200;
+  box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.1);
+  transform: translateY(-2px);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
