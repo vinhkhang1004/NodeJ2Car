@@ -201,14 +201,17 @@ const OrderInfo = () => {
                         </CardHeader>
                         <CardContent className="pt-6 space-y-4">
                            <div>
+                               <p className="text-white font-bold mb-1">{order.shippingAddress?.name}</p>
+                               <p className="text-slate-400 text-xs mb-3 italic">{order.shippingAddress?.email}</p>
                                <p className="text-slate-300 mb-1 leading-relaxed">{order.shippingAddress?.address}</p>
                                <p className="text-slate-300 font-medium">{order.shippingAddress?.city}, {order.shippingAddress?.country}</p>
                            </div>
                            <div className="pt-4 border-t border-slate-800/50">
-                               <p className="text-slate-400 text-xs mb-1">Số điện thoại</p>
+                               <p className="text-slate-400 text-xs mb-1">Số điện thoại liên hệ</p>
                                <p className="text-white font-mono">{order.shippingAddress?.phone}</p>
                            </div>
                         </CardContent>
+
                     </Card>
 
                     {/* Payment Status */}
