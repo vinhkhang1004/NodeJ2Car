@@ -34,6 +34,7 @@ import Cart from './pages/Cart';
 import UserList from './pages/admin/UserList';
 import OrderList from './pages/admin/OrderList';
 import OrderInfo from './pages/admin/OrderInfo';
+import ReviewList from './pages/admin/ReviewList';
 
 function PublicLayout() {
   return (
@@ -99,6 +100,9 @@ function App() {
             {/* Orders */}
             <Route path="/admin/orders" element={<OrderList />} />
             <Route path="/admin/orders/:id" element={<OrderInfo />} />
+
+            {/* Reviews */}
+            <Route path="/admin/reviews" element={<ReviewList />} />
           </Route>
         </Route>
       </Routes>
