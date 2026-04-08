@@ -27,19 +27,19 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
-    const handleExportExcel = () => {
-        const dataToExport = orders.map((order) => ({
-            'Mã đơn hàng': order._id.toUpperCase(),
-            'Ngày đặt': new Date(order.createdAt).toLocaleString('vi-VN'),
-            'Khách hàng': order.shippingAddress?.name || order.user?.name || 'N/A',
-            'Email': order.shippingAddress?.email || order.user?.email || 'N/A',
-            'Số điện thoại': order.shippingAddress?.phone || 'N/A',
-            'Địa chỉ': order.shippingAddress?.address || 'N/A',
-            'Thành phố': order.shippingAddress?.city || 'N/A',
-            'Tổng tiền (VNĐ)': order.totalPrice,
-            'Phương thức': order.paymentMethod,
-            'Thanh toán': order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán',
-            'Trạng thái': order.status,
+    const handleExportOrders = () => {
+        const dataToExport = orders.map(order => ({
+            'ID Đơn hàng': order._id,
+            'Khách hàng': order.shippingAddress?.name || order.user?.name || 'Ẩn danh',
+            'Số điện thoại': order.shippingAddress?.phone || '',
+            'Địa chỉ': `${order.shippingAddress?.address}, ${order.shippingAddress?.city}`,
+            'Ngày đặt': new Date(order.createdAt).toLocaleDateString('vi-VN'),
+            'Tổng tiền': order.totalPrice,
+            'Trạng thái': order.status === 'Processing' ? 'Đang xử lý' : 
+                         order.status === 'Shipped' ? 'Đang giao' :
+                         order.status === 'Delivered' ? 'Đã giao' : 
+                         order.status === 'Cancelled' ? 'Đã hủy' : order.status,
+            'Thanh toán': order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'
         }));
 
         exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
@@ -48,13 +48,13 @@ const OrderList = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
-                return <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20"><Clock size={12} className="mr-1" /> Chờ xử lý</Badge>;
+                return <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20"><Clock size={12} className="mr-1" /> Đang xử lý</Badge>;
             case 'Shipped':
-                return <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20"><Truck size={12} className="mr-1" /> Đang giao</Badge>;
+                return <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20"><Truck size={12} className="mr-1" /> Đang giao</Badge>;
             case 'Delivered':
                 return <Badge className="bg-green-500/10 text-green-400 border-green-500/20"><CheckCircle size={12} className="mr-1" /> Đã giao</Badge>;
             case 'Cancelled':
-                return <Badge className="bg-red-500/10 text-red-400 border-red-500/20"><XCircle size={12} className="mr-1" /> Đã huỷ</Badge>;
+                return <Badge className="bg-red-500/10 text-red-400 border-red-500/20"><XCircle size={12} className="mr-1" /> Đã hủy</Badge>;
             default:
                 return <Badge>{status}</Badge>;
         }
@@ -69,13 +69,15 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
-                <Button 
-                    onClick={handleExportExcel}
-                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 rounded-xl h-12 shadow-lg shadow-green-900/20"
-                    disabled={orders.length === 0}
-                >
-                    <FileSpreadsheet size={18} /> Xuất Excel
-                </Button>
+                <div className="flex gap-2">
+                    <Button 
+                        onClick={handleExportOrders} 
+                        variant="outline" 
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10"
+                    >
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel Đơn Hàng
+                    </Button>
+                </div>
             </div>
 
             {error && (

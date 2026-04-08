@@ -63,6 +63,23 @@ const ProductList = () => {
         loadProducts();
     };
 
+    const handleExportExcel = () => {
+        const dataToExport = products.map(p => ({
+            'ID Sản phẩm': p._id,
+            'Mã SKU': p.sku || 'N/A',
+            'Tên sản phẩm': p.name,
+            'Thương hiệu': p.brand || 'N/A',
+            'Danh mục': typeof p.category === 'object' ? p.category?.name : (p.category || 'N/A'),
+            'Giá niêm yết (VNĐ)': p.price,
+            'Tồn kho': p.stock,
+            'Trạng thái': p.isActive ? 'Hiển thị' : 'Ẩn',
+            'Mô tả': p.description,
+            'Ngày tạo': new Date(p.createdAt).toLocaleDateString('vi-VN')
+        }));
+
+        exportToExcel(dataToExport, `Danh_sach_san_pham_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'SanPham');
+    };
+
     const handleDelete = async (id, name) => {
         if (!window.confirm(`Xác nhận xoá sản phẩm "${name}"?`)) return;
         try {
@@ -77,22 +94,6 @@ const ProductList = () => {
         }
     };
 
-    const handleExportExcel = () => {
-        const dataToExport = products.map((product) => ({
-            'Mã sản phẩm': product._id.toUpperCase(),
-            'Tên sản phẩm': product.name,
-            'SKU': product.sku || 'N/A',
-            'Danh mục': product.category?.name || 'N/A',
-            'Thương hiệu': product.brand || 'N/A',
-            'Giá (VNĐ)': product.price,
-            'Tồn kho': product.stock,
-            'Trạng thái': product.isActive ? 'Hiển thị' : 'Ẩn',
-            'Ngày tạo': new Date(product.createdAt).toLocaleString('vi-VN'),
-        }));
-
-        exportToExcel(dataToExport, `Danh_sach_san_pham_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'SanPham');
-    };
-
     return (
         <div className="animate-fade-in pb-12 text-white/90">
             {/* Header */}
@@ -103,14 +104,13 @@ const ProductList = () => {
                         Tổng cộng <span className="text-white font-medium">{total}</span> sản phẩm
                     </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                     <Button 
-                        onClick={handleExportExcel}
-                        variant="outline"
-                        className="bg-transparent border-green-600/50 text-green-400 hover:bg-green-600/10 flex items-center gap-2"
-                        disabled={products.length === 0}
+                        onClick={handleExportExcel} 
+                        variant="outline" 
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10"
                     >
-                        <FileSpreadsheet size={16} /> Xuất Excel
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel
                     </Button>
                     <Button asChild className="bg-white text-black hover:bg-slate-200">
                         <Link to="/admin/products/create">
