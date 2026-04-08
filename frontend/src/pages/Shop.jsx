@@ -23,6 +23,7 @@ const Shop = () => {
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     // Sync filter states with URL search params
+    // ..
     const [filters, setFilters] = useState({
         category: searchParams.get('category') || '',
         brand: searchParams.get('brand') || '',

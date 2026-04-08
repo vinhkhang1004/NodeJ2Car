@@ -313,8 +313,8 @@ const Profile = () => {
                     </Card>
                 </div>
 
-                {/* Address Management — full width below */}
-                <div className="lg:col-span-3">
+                {/* Address Management */}
+                <div className="lg:col-span-2">
                     <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
                         <CardHeader className="bg-[#27272a]/30 border-b border-slate-800">
                             <div className="flex items-center justify-between">
@@ -385,6 +385,79 @@ const Profile = () => {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Order History */}
+                <div className="lg:col-span-3">
+                    <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
+                        <CardHeader className="bg-[#27272a]/30 border-b border-slate-800 flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="text-xl flex items-center gap-2">
+                                    <ShoppingBag size={20} className="text-primary" /> Lịch sử đơn hàng
+                                </CardTitle>
+                                <CardDescription className="text-slate-500">Xem lại các đơn hàng bạn đã mua và trạng thái hiện tại.</CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {loadingOrders ? (
+                                <div className="flex justify-center items-center py-20">
+                                    <Loader2 className="animate-spin text-primary" size={40} />
+                                </div>
+                            ) : orders.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-20 opacity-40">
+                                    <ShoppingBag size={56} className="mb-4 text-slate-600" />
+                                    <p className="text-slate-400 font-semibold">Bạn chưa có đơn hàng nào.</p>
+                                    <Button variant="link" asChild className="mt-2 text-primary">
+                                        <Link to="/">Mua sắm ngay</Link>
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-[11px] text-slate-500 uppercase tracking-widest border-b border-slate-800 bg-slate-900/30">
+                                            <tr>
+                                                <th className="px-6 py-4">Mã đơn hàng</th>
+                                                <th className="px-6 py-4">Ngày đặt</th>
+                                                <th className="px-6 py-4 text-center">Tổng tiền</th>
+                                                <th className="px-6 py-4 text-center">Trạng thái</th>
+                                                <th className="px-6 py-4 text-center">Thanh toán</th>
+                                                <th className="px-6 py-4"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-800/50">
+                                            {orders.map((order) => (
+                                                <tr key={order._id} className="hover:bg-slate-800/20 transition-colors group">
+                                                    <td className="px-6 py-4 font-mono text-xs text-slate-400">
+                                                        #{order._id.slice(-8).toUpperCase()}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-slate-300">
+                                                        {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center font-bold text-primary">
+                                                        {order.totalPrice?.toLocaleString('vi-VN')}₫
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        {getStatusBadge(order.status)}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        {order.isPaid ? (
+                                                            <span className="text-green-400 text-xs font-bold bg-green-500/10 px-2 py-1 rounded">Đã thanh toán</span>
+                                                        ) : (
+                                                            <span className="text-slate-400 text-xs font-bold border border-slate-700 px-2 py-1 rounded">Chưa thanh toán</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        {/* Optional: Add Link to order details page if it exists */}
+                                                        <span className="text-slate-600 text-xs italic">Chi tiết được gửi qua email</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             )}
                         </CardContent>

@@ -22,6 +22,7 @@ const getCategories = async (req, res) => {
 // @desc    Get single category by id or slug
 // @route   GET /api/categories/:id
 // @access  Public
+// ..
 const getCategoryById = async (req, res) => {
     try {
         const { id } = req.params;

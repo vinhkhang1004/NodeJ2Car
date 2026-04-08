@@ -3,6 +3,7 @@ const AutoPart = require('../models/AutoPart.js');
 // @desc    Fetch all auto parts with optional search
 // @route   GET /api/parts
 // @access  Public
+// ..
 const getParts = async (req, res) => {
     try {
         const pageSize = Number(req.query.limit) || 12;

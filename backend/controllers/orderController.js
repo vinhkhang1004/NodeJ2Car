@@ -4,6 +4,7 @@ const AutoPart = require('../models/AutoPart.js');
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
+// ..
 const addOrderItems = async (req, res) => {
     const {
         orderItems,
@@ -38,11 +39,10 @@ const addOrderItems = async (req, res) => {
 
         // Update stock
         for (const item of orderItems) {
-            const product = await AutoPart.findById(item.product || item._id);
-            if (product) {
-                product.stock -= item.qty;
-                await product.save();
-            }
+            await AutoPart.updateOne(
+                { _id: item.product || item._id },
+                { $inc: { stock: -item.qty } }
+            );
         }
 
         res.status(201).json(createdOrder);
