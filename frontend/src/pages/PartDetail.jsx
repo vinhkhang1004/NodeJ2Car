@@ -29,7 +29,8 @@ const PartDetail = () => {
         const fetchPart = async () => {
             try {
                 setLoading(true);
-                const { data } = await api.get(`/parts/${id}`);
+                // Switch to /products/:id for better data and populated categories
+                const { data } = await api.get(`/products/${id}`);
                 setPart(data);
                 setError('');
             } catch (err) {
@@ -67,6 +68,8 @@ const PartDetail = () => {
     const vndPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format((part.price || 0) * 1.12);
     const discountPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(part.price || 0);
 
+    const categoryName = typeof part.category === 'object' ? part.category?.name : part.category;
+
     return (
         <div className="bg-white pb-24">
             {/* Breadcrumbs */}
@@ -74,7 +77,7 @@ const PartDetail = () => {
                 <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-12">
                     <Link to="/" className="hover:text-blue-950 transition-colors">Trang Chủ</Link>
                     <ChevronRight size={12} />
-                    <Link to="/shop" className="hover:text-blue-950 transition-colors">Hiệu Suất Cao</Link>
+                    <Link to="/shop" className="hover:text-blue-950 transition-colors">{categoryName || 'Sản phẩm'}</Link>
                     <ChevronRight size={12} />
                     <span className="text-blue-950">{part.name}</span>
                 </div>
@@ -108,13 +111,13 @@ const PartDetail = () => {
                     <div className="space-y-10">
                         <div>
                             <span className="text-[10px] font-black text-blue-700 uppercase tracking-[0.3em] bg-blue-50 px-3 py-1 rounded-full mb-6 inline-block">
-                                Kỹ Thuật Chính Xác
+                                {part.brand || 'Premium Quality'}
                             </span>
                             <h1 className="text-4xl md:text-5xl font-black text-blue-950 leading-tight tracking-tighter uppercase mb-6">
                                 {part.name}
                             </h1>
                             <p className="text-slate-500 font-medium leading-relaxed mb-8">
-                                {part.description} Được thiết kế cho các kỹ sư đam mê tốc độ. Sử dụng hợp kim {part.category === 'Động Cơ' ? 'titan siêu nhẹ' : 'nhôm hàng không'} giúp giảm trọng lượng và tăng công suất lên đến 35%.
+                                {part.description} Được thiết kế cho các kỹ sư đam mê tốc độ. Sử dụng hợp kim {categoryName === 'Động Cơ' ? 'titan siêu nhẹ' : 'nhôm hàng không'} giúp giảm trọng lượng và tăng công suất tối ưu.
                             </p>
                         </div>
 
@@ -157,7 +160,7 @@ const PartDetail = () => {
                                     <ShoppingCart size={16} /> Thêm Giỏ Hàng
                                 </button>
                             </div>
-                            <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest uppercase tracking-widest">
+                            <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
                                 Giao hàng miễn phí toàn quốc trong 24h
                             </p>
                         </div>

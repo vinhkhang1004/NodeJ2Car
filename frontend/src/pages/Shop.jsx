@@ -9,13 +9,15 @@ import {
     List, 
     Search, 
     ChevronLeft,
-    X
+    X,
+    FolderTree
 } from 'lucide-react';
 
 const Shop = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { keyword } = useParams();
     const [parts, setParts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [metadata, setMetadata] = useState({ page: 1, pages: 1, total: 0 });
     const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -30,8 +32,20 @@ const Shop = () => {
         page: Number(searchParams.get('page')) || 1
     });
 
-    const categories = ['Động Cơ', 'Hệ Thống Phanh', 'Ngoại Thất', 'Nội Thất', 'Hiệu Suất', 'Hệ Thống Xả'];
     const brands = ['Brembo Engineering', 'Bosch Performance', 'Akrapovič Systems', 'BBS Motorsport', 'Bilstein'];
+
+    // Fetch dynamic categories
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const { data } = await api.get('/categories?active=true');
+                setCategories(data);
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     // Sync local filters state whenever URL params change
     useEffect(() => {
@@ -57,11 +71,14 @@ const Shop = () => {
                 params.append('page', filters.page);
                 params.append('limit', 12);
 
-                const { data } = await api.get(`/parts?${params.toString()}`);
-                setParts(data.parts);
+                // Use the improved /api/products endpoint instead of /api/parts
+                const { data } = await api.get(`/products?${params.toString()}`);
+                // Map frontend 'parts' state to backend 'products' response
+                setParts(data.products || []);
                 setMetadata({ page: data.page, pages: data.pages, total: data.total });
             } catch (err) {
                 console.error('Error fetching parts:', err);
+                setParts([]);
             } finally {
                 setLoading(false);
             }
@@ -72,11 +89,22 @@ const Shop = () => {
 
     const handleFilterChange = (key, value) => {
         const updatedFilters = { ...filters, [key]: value, page: 1 };
-        setSearchParams(updatedFilters);
+        // Clean empty filters before setting search params
+        const cleanParams = {};
+        Object.entries(updatedFilters).forEach(([k, v]) => {
+            if (v) cleanParams[k] = v;
+        });
+        setSearchParams(cleanParams);
     };
 
     const clearFilters = () => {
         setSearchParams({});
+    };
+
+    // Helper to get active category name for UI display
+    const getCategoryName = (id) => {
+        const cat = categories.find(c => c._id === id);
+        return cat ? cat.name : 'Tất cả sản phẩm';
     };
 
     return (
@@ -92,7 +120,7 @@ const Shop = () => {
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
                             <h1 className="text-4xl font-black text-blue-950 tracking-tighter uppercase mb-2">
-                                {keyword ? `Tìm kiếm: ${keyword}` : filters.category || 'Tất cả sản phẩm'}
+                                {keyword ? `Tìm kiếm: ${keyword}` : (filters.category ? getCategoryName(filters.category) : 'Tất cả sản phẩm')}
                             </h1>
                             <p className="text-slate-500 font-medium text-sm max-w-xl">
                                 Khám phá kho linh kiện cơ khí chính xác được kiểm định khắt khe theo tiêu chuẩn chuyên gia.
@@ -120,9 +148,9 @@ const Shop = () => {
                         <div className="sticky top-24 space-y-12">
                             {/* Brand Filter */}
                             <div>
-                                <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6 flex items-center justify-between">
+                                <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6 flex items-center justify-between border-b border-slate-50 pb-2">
                                     Thương Hiệu
-                                    {filters.brand && <button onClick={() => handleFilterChange('brand', '')} className="text-orange-500 normal-case tracking-normal font-bold">Xóa</button>}
+                                    {filters.brand && <button onClick={() => handleFilterChange('brand', '')} className="text-orange-500 normal-case font-black tracking-tight text-[10px]">Xóa</button>}
                                 </h3>
                                 <div className="space-y-3">
                                     {brands.map(brand => (
@@ -131,9 +159,9 @@ const Shop = () => {
                                                 type="checkbox" 
                                                 checked={filters.brand === brand}
                                                 onChange={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)}
-                                                className="w-4 h-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900" 
+                                                className="w-4 h-4 rounded border-slate-300 text-blue-950 focus:ring-blue-950" 
                                             />
-                                            <span className={`text-sm font-bold transition-colors ${filters.brand === brand ? 'text-blue-950' : 'text-slate-500 group-hover:text-blue-950'}`}>
+                                            <span className={`text-[11px] font-black uppercase tracking-wider transition-colors ${filters.brand === brand ? 'text-blue-950' : 'text-slate-400 group-hover:text-blue-950'}`}>
                                                 {brand}
                                             </span>
                                         </label>
@@ -143,27 +171,31 @@ const Shop = () => {
 
                             {/* Category Filter */}
                             <div>
-                                <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6">Danh Mục</h3>
+                                <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6 border-b border-slate-50 pb-2 flex items-center justify-between">
+                                    Danh Mục
+                                    {filters.category && <button onClick={() => handleFilterChange('category', '')} className="text-orange-500 normal-case font-black tracking-tight text-[10px]">Xóa</button>}
+                                </h3>
                                 <div className="flex flex-wrap gap-2">
                                     {categories.map(cat => (
                                         <button 
-                                            key={cat}
-                                            onClick={() => handleFilterChange('category', filters.category === cat ? '' : cat)}
-                                            className={`px-4 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all ${
-                                                filters.category === cat 
+                                            key={cat._id}
+                                            onClick={() => handleFilterChange('category', filters.category === cat._id ? '' : cat._id)}
+                                            className={`px-4 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest transition-all ${
+                                                filters.category === cat._id 
                                                 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
                                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                                             }`}
                                         >
-                                            {cat}
+                                            {cat.name}
                                         </button>
                                     ))}
+                                    {categories.length === 0 && <p className="text-[10px] text-slate-400 font-medium italic">Đang tải danh mục...</p>}
                                 </div>
                             </div>
 
                             <button 
                                 onClick={clearFilters}
-                                className="w-full py-4 border border-slate-200 text-slate-400 hover:text-blue-950 hover:border-blue-950 transition-all text-[10px] font-black uppercase tracking-[0.2em]"
+                                className="w-full py-4 border border-slate-200 text-slate-400 hover:text-blue-950 hover:border-blue-950 transition-all text-[10px] font-black uppercase tracking-[0.2em] rounded-sm"
                             >
                                 Thiết lập lại bộ lọc
                             </button>
@@ -173,7 +205,7 @@ const Shop = () => {
                     {/* Mobile Filter Trigger */}
                     <button 
                         onClick={() => setShowMobileFilters(true)}
-                        className="lg:hidden flex items-center justify-center gap-2 w-full py-4 bg-slate-900 text-white rounded-sm font-black text-xs uppercase tracking-widest"
+                        className="lg:hidden flex items-center justify-center gap-2 w-full py-4 bg-blue-950 text-white rounded-sm font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20"
                     >
                         <Filter size={16} /> Bộ lọc & Tìm kiếm
                     </button>
@@ -188,7 +220,7 @@ const Shop = () => {
                             </div>
                         ) : parts.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-20">
                                     {parts.map(part => (
                                         <PartCard key={part._id} part={part} />
                                     ))}
@@ -199,7 +231,7 @@ const Shop = () => {
                                     <button 
                                         onClick={() => handleFilterChange('page', Math.max(1, filters.page - 1))}
                                         disabled={filters.page === 1}
-                                        className="w-10 h-10 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-30 transition-colors"
+                                        className="w-12 h-12 flex items-center justify-center border border-slate-200 rounded-sm hover:bg-slate-50 disabled:opacity-20 transition-colors"
                                     >
                                         <ChevronLeft size={18} />
                                     </button>
@@ -208,10 +240,10 @@ const Shop = () => {
                                         <button 
                                             key={i}
                                             onClick={() => handleFilterChange('page', i + 1)}
-                                            className={`w-10 h-10 flex items-center justify-center rounded text-xs font-black transition-all ${
+                                            className={`w-12 h-12 flex items-center justify-center rounded-sm text-xs font-black transition-all ${
                                                 metadata.page === i + 1 
-                                                ? 'bg-blue-950 text-white shadow-xl shadow-blue-900/20 scale-110' 
-                                                : 'text-slate-400 hover:text-blue-950 hover:bg-slate-50'
+                                                ? 'bg-blue-950 text-white shadow-2xl shadow-blue-900/40 scale-110 z-10' 
+                                                : 'text-slate-400 hover:text-blue-950 hover:bg-slate-50 border border-transparent'
                                             }`}
                                         >
                                             {String(i + 1).padStart(2, '0')}
@@ -221,18 +253,18 @@ const Shop = () => {
                                     <button 
                                         onClick={() => handleFilterChange('page', Math.min(metadata.pages, filters.page + 1))}
                                         disabled={filters.page === metadata.pages}
-                                        className="w-10 h-10 flex items-center justify-center border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-30 transition-colors"
+                                        className="w-12 h-12 flex items-center justify-center border border-slate-200 rounded-sm hover:bg-slate-50 disabled:opacity-20 transition-colors"
                                     >
                                         <ChevronRight size={18} />
                                     </button>
                                 </div>
                             </>
                         ) : (
-                            <div className="py-32 text-center">
-                                <Search className="w-20 h-20 text-slate-200 mx-auto mb-6" />
-                                <h3 className="text-xl font-black text-blue-950 mb-2">Không tìm thấy sản phẩm</h3>
-                                <p className="text-slate-500 font-medium">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
-                                <button onClick={clearFilters} className="mt-8 px-8 py-4 bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest rounded-sm">Xóa tất cả bộ lọc</button>
+                            <div className="py-32 text-center border-2 border-dashed border-slate-100 rounded-3xl">
+                                <Search className="w-20 h-20 text-slate-100 mx-auto mb-6" />
+                                <h3 className="text-xl font-black text-blue-950 mb-2 uppercase tracking-tighter">Không tìm thấy sản phẩm</h3>
+                                <p className="text-slate-400 font-medium text-sm">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
+                                <button onClick={clearFilters} className="mt-10 px-10 py-5 bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest rounded-sm shadow-xl shadow-blue-900/20">Xóa tất cả bộ lọc</button>
                             </div>
                         )}
                     </main>
@@ -241,54 +273,58 @@ const Shop = () => {
 
             {/* Mobile Filters Modal */}
             {showMobileFilters && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
-                    <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-2xl">
-                        <div className="p-8 flex flex-col h-full">
-                            <div className="flex items-center justify-between mb-10">
+                <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-blue-950/40 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
+                    <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-2xl animate-in slide-in-from-right duration-500">
+                        <div className="p-10 flex flex-col h-full">
+                            <div className="flex items-center justify-between mb-12">
                                 <h2 className="text-xl font-black text-blue-950 uppercase tracking-tighter">Bộ lọc tìm kiếm</h2>
-                                <button onClick={() => setShowMobileFilters(false)} className="p-2 text-slate-400"><X size={24} /></button>
+                                <button onClick={() => setShowMobileFilters(false)} className="p-2 text-slate-400 hover:text-blue-950"><X size={24} /></button>
                             </div>
                             
-                            <div className="flex-1 overflow-y-auto space-y-10 pr-4">
+                            <div className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar">
                                 <div>
-                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Thương Hiệu</h3>
+                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-50 pb-2">Thương Hiệu</h3>
                                     <div className="space-y-4">
                                         {brands.map(brand => (
-                                            <label key={brand} className="flex items-center gap-4">
+                                            <label key={brand} className="flex items-center gap-4 cursor-pointer group">
                                                 <input 
                                                     type="checkbox" 
                                                     checked={filters.brand === brand}
                                                     onChange={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)}
-                                                    className="w-5 h-5 rounded border-slate-300 text-blue-900 focus:ring-blue-900" 
+                                                    className="w-5 h-5 rounded border-slate-300 text-blue-950 focus:ring-blue-950" 
                                                 />
-                                                <span className="text-sm font-bold text-blue-950">{brand}</span>
+                                                <span className={`text-[11px] font-black uppercase tracking-wider transition-colors ${filters.brand === brand ? 'text-blue-950' : 'text-slate-400'}`}>
+                                                    {brand}
+                                                </span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Danh Mục</h3>
+                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-50 pb-2">Danh Mục</h3>
                                     <div className="flex flex-wrap gap-3">
                                         {categories.map(cat => (
                                             <button 
-                                                key={cat}
-                                                onClick={() => handleFilterChange('category', filters.category === cat ? '' : cat)}
-                                                className={`px-5 py-3 rounded-sm text-[10px] font-bold uppercase tracking-widest transition-all ${
-                                                    filters.category === cat ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-500'
+                                                key={cat._id}
+                                                onClick={() => handleFilterChange('category', filters.category === cat._id ? '' : cat._id)}
+                                                className={`px-5 py-3 rounded-sm text-[10px] font-black uppercase tracking-widest transition-all ${
+                                                    filters.category === cat._id 
+                                                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
+                                                    : 'bg-slate-100 text-slate-500'
                                                 }`}
                                             >
-                                                {cat}
+                                                {cat.name}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-8 mt-auto border-t border-slate-100 grid grid-cols-2 gap-4">
-                                <button onClick={clearFilters} className="py-4 border border-slate-200 text-xs font-black uppercase tracking-widest">Thiết lập lại</button>
-                                <button onClick={() => setShowMobileFilters(false)} className="py-4 bg-orange-500 text-white text-xs font-black uppercase tracking-widest shadow-xl shadow-orange-500/20">Áp dụng</button>
+                            <div className="pt-10 mt-auto border-t border-slate-100 grid grid-cols-2 gap-4">
+                                <button onClick={clearFilters} className="py-5 border border-slate-200 text-[10px] font-black uppercase tracking-widest rounded-sm">Xóa bộ lọc</button>
+                                <button onClick={() => setShowMobileFilters(false)} className="py-5 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 rounded-sm">Áp dụng</button>
                             </div>
                         </div>
                     </div>
