@@ -10,7 +10,9 @@ import {
     ShoppingBag,
     CarFront,
     ExternalLink,
+    MessageSquare,
 } from 'lucide-react';
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const AdminLayout = () => {
@@ -35,9 +37,11 @@ const AdminLayout = () => {
                 { name: 'Sản phẩm', icon: Package, path: '/admin/products' },
                 { name: 'Danh mục', icon: Tag, path: '/admin/categories' },
                 { name: 'Đơn hàng', icon: ShoppingBag, path: '/admin/orders' },
+                { name: 'Đánh giá', icon: MessageSquare, path: '/admin/reviews' },
                 { name: 'Người dùng', icon: Users, path: '/admin/users' },
             ]
         },
+
     ];
 
     return (

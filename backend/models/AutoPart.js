@@ -1,5 +1,23 @@
 const mongoose = require('mongoose');
 
+const reviewSchema = mongoose.Schema(
+    {
+        name: { type: String, required: true },
+        rating: { type: Number, required: true },
+        comment: { type: String, required: true },
+        reply: { type: String }, // Admin response
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User',
+        },
+    },
+
+    {
+        timestamps: true,
+    }
+);
+
 const autoPartSchema = mongoose.Schema(
     {
         name: {
@@ -12,6 +30,17 @@ const autoPartSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Category',
             required: [true, 'Category is required'],
+        },
+        reviews: [reviewSchema],
+        rating: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        numReviews: {
+            type: Number,
+            required: true,
+            default: 0,
         },
         price: {
             type: Number,
@@ -59,6 +88,7 @@ const autoPartSchema = mongoose.Schema(
         toObject: { virtuals: true },
     }
 );
+
 
 // Text index for full-text search
 autoPartSchema.index({ name: 'text', brand: 'text', description: 'text' });
