@@ -6,8 +6,9 @@ import {
     Plus, Package, Users, ShoppingBag, DollarSign,
     TrendingUp, TrendingDown, ArrowRight, Loader2,
     AlertTriangle, CheckCircle, Clock, Truck, XCircle,
-    BarChart3
+    BarChart3, FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel } from '../../lib/exportExcel';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,16 +52,16 @@ const StatCard = ({ icon: Icon, title, value, subValue, trend, color }) => {
 
 const OrderStatusBadge = ({ status }) => {
     const map = {
-        'Processing': { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', icon: Clock },
-        'Shipped':    { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',       icon: Truck },
-        'Delivered':  { color: 'bg-green-500/10 text-green-400 border-green-500/20',    icon: CheckCircle },
-        'Cancelled':  { color: 'bg-red-500/10 text-red-400 border-red-500/20',          icon: XCircle },
+        'Processing': { label: 'Đang xử lý', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', icon: Clock },
+        'Shipped':    { label: 'Đang giao',  color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',       icon: Truck },
+        'Delivered':  { label: 'Đã giao',    color: 'bg-green-500/10 text-green-400 border-green-500/20',    icon: CheckCircle },
+        'Cancelled':  { label: 'Đã hủy',     color: 'bg-red-500/10 text-red-400 border-red-500/20',          icon: XCircle },
     };
-    const cfg = map[status] || { color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: Clock };
+    const cfg = map[status] || { label: status, color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: Clock };
     const Icon = cfg.icon;
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-bold ${cfg.color}`}>
-            <Icon size={11} /> {status}
+            <Icon size={11} /> {cfg.label}
         </span>
     );
 };
@@ -105,6 +106,8 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
+<<<<<<< HEAD
+=======
     const handleExportRevenue = async () => {
         try {
             await exportRevenue();
@@ -112,6 +115,7 @@ const AdminDashboard = () => {
             console.error('Lỗi xuất file:', error);
         }
     };
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-[60vh]">
@@ -159,6 +163,26 @@ const AdminDashboard = () => {
         return result;
     })();
 
+    const handleExportRevenue = () => {
+        const dataToExport = chartData.map(d => ({
+            'Ngày': d.name,
+            'Doanh thu (VNĐ)': d.revenue,
+            'Số đơn hàng': d.orders
+        }));
+        
+        // Add a total row at the end
+        const totalRevenue = dataToExport.reduce((acc, curr) => acc + curr['Doanh thu (VNĐ)'], 0);
+        const totalOrders = dataToExport.reduce((acc, curr) => acc + curr['Số đơn hàng'], 0);
+        
+        dataToExport.push({
+            'Ngày': 'TỔNG CỘNG (30 ngày)',
+            'Doanh thu (VNĐ)': totalRevenue,
+            'Số đơn hàng': totalOrders
+        });
+
+        exportToExcel(dataToExport, `Bao_cao_doanh_thu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DoanhThu');
+    };
+
     const statusMap = {};
     (stats?.statusCounts || []).forEach(s => { statusMap[s._id] = s.count; });
 
@@ -171,8 +195,17 @@ const AdminDashboard = () => {
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
+<<<<<<< HEAD
+                    <Button 
+                        onClick={handleExportRevenue} 
+                        variant="outline" 
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10 rounded-xl h-10"
+                    >
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất doanh thu
+=======
                     <Button onClick={handleExportRevenue} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <BarChart3 size={16} className="mr-2" /> Xuất Báo Cáo Doanh Thu
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
                     </Button>
                     <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <ShoppingBag size={16} className="mr-2" /> Đơn hàng

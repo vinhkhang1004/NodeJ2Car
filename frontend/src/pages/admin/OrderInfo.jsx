@@ -98,10 +98,10 @@ const OrderInfo = () => {
                             <SelectValue placeholder="Trạng thái" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#18181b] border-slate-700 text-white">
-                            <SelectItem value="Processing">Chờ xử lý</SelectItem>
+                            <SelectItem value="Processing">Đang xử lý</SelectItem>
                             <SelectItem value="Shipped">Đang giao</SelectItem>
                             <SelectItem value="Delivered">Đã giao</SelectItem>
-                            <SelectItem value="Cancelled">Đã huỷ</SelectItem>
+                            <SelectItem value="Cancelled">Đã hủy</SelectItem>
                         </SelectContent>
                     </Select>
                     {!order.isDelivered && (
