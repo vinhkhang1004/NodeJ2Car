@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import { fetchOrders } from '../../services/orderService';
 import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { exportToExcel } from '../../lib/exportExcel';
+=======
+import { fetchOrders, exportOrders } from '../../services/orderService';
+import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +32,7 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
+<<<<<<< HEAD
     const handleExportOrders = () => {
         const dataToExport = orders.map(order => ({
             'ID Đơn hàng': order._id,
@@ -45,6 +51,15 @@ const OrderList = () => {
         exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
     };
 
+=======
+    const handleExportOrders = async () => {
+        try {
+            await exportOrders();
+        } catch (error) {
+            console.error('Lỗi xuất file:', error);
+        }
+    };
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
@@ -69,6 +84,7 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
+<<<<<<< HEAD
                 <div className="flex gap-2">
                     <Button 
                         onClick={handleExportOrders} 
@@ -78,6 +94,11 @@ const OrderList = () => {
                         <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel Đơn Hàng
                     </Button>
                 </div>
+=======
+                <Button onClick={handleExportOrders} variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800">
+                    Xuất Hóa Đơn Excel
+                </Button>
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
             </div>
 
             {error && (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { exportRevenue } from '../../services/orderService';
 import {
     Plus, Package, Users, ShoppingBag, DollarSign,
     TrendingUp, TrendingDown, ArrowRight, Loader2,
@@ -105,6 +106,16 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
+<<<<<<< HEAD
+=======
+    const handleExportRevenue = async () => {
+        try {
+            await exportRevenue();
+        } catch (error) {
+            console.error('Lỗi xuất file:', error);
+        }
+    };
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-[60vh]">
@@ -184,12 +195,17 @@ const AdminDashboard = () => {
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
+<<<<<<< HEAD
                     <Button 
                         onClick={handleExportRevenue} 
                         variant="outline" 
                         className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10 rounded-xl h-10"
                     >
                         <FileSpreadsheet size={16} className="mr-2" /> Xuất doanh thu
+=======
+                    <Button onClick={handleExportRevenue} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
+                        <BarChart3 size={16} className="mr-2" /> Xuất Báo Cáo Doanh Thu
+>>>>>>> 1af2c8a1056c28e359c2704c7eb80fc7a056958d
                     </Button>
                     <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <ShoppingBag size={16} className="mr-2" /> Đơn hàng

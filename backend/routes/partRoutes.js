@@ -8,6 +8,7 @@ const {
     deletePart,
     getAdminStats,
     createPartReview,
+    updateUserReview,
     getAdminReviews,
     updateReviewReply,
     deleteReview,
@@ -22,7 +23,9 @@ router.route('/admin/stats').get(protect, admin, getAdminStats);
 router.route('/admin/reviews').get(protect, admin, getAdminReviews);
 router.route('/:id/reviews').post(protect, createPartReview);
 router.route('/:partId/reviews/:reviewId/reply').post(protect, admin, updateReviewReply);
-router.route('/:partId/reviews/:reviewId').delete(protect, admin, deleteReview);
+router.route('/:partId/reviews/:reviewId')
+    .put(protect, updateUserReview)
+    .delete(protect, deleteReview);
 
 
 router.route('/:id')
