@@ -18,12 +18,11 @@ const Shop = () => {
     const { keyword } = useParams();
     const [parts, setParts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
     const [metadata, setMetadata] = useState({ page: 1, pages: 1, total: 0 });
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-    // Sync filter states with URL search params
-    // ..
     const [filters, setFilters] = useState({
         category: searchParams.get('category') || '',
         brand: searchParams.get('brand') || '',
@@ -32,19 +31,21 @@ const Shop = () => {
         page: Number(searchParams.get('page')) || 1
     });
 
-    const brands = ['Brembo Engineering', 'Bosch Performance', 'Akrapovič Systems', 'BBS Motorsport', 'Bilstein'];
-
-    // Fetch dynamic categories
+    // Fetch dynamic categories and brands
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchMetadata = async () => {
             try {
-                const { data } = await api.get('/categories?active=true');
-                setCategories(data);
+                const [catRes, brandRes] = await Promise.all([
+                    api.get('/categories?active=true'),
+                    api.get('/parts/brands')
+                ]);
+                setCategories(catRes.data);
+                setBrands(brandRes.data);
             } catch (err) {
-                console.error('Error fetching categories:', err);
+                console.error('Error fetching metadata:', err);
             }
         };
-        fetchCategories();
+        fetchMetadata();
     }, []);
 
     // Sync local filters state whenever URL params change
@@ -57,6 +58,7 @@ const Shop = () => {
             page: Number(searchParams.get('page')) || 1
         });
     }, [searchParams]);
+
 
     useEffect(() => {
         const fetchParts = async () => {
