@@ -180,6 +180,49 @@ const createPartReview = async (req, res) => {
     }
 };
 
+// @desc    Update user review
+// @route   PUT /api/parts/:partId/reviews/:reviewId
+// @access  Private
+const updateUserReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const part = await AutoPart.findById(req.params.partId);
+
+        if (part) {
+            const review = part.reviews.id(req.params.reviewId);
+            
+            if (review) {
+                // Check if user is the owner
+                if (review.user.toString() !== req.user._id.toString()) {
+                    return res.status(401).json({ message: 'Not authorized to update this review' });
+                }
+
+                // Check if Admin has replied
+                if (review.reply) {
+                    return res.status(400).json({ message: 'Cannot edit review after admin response' });
+                }
+
+                review.rating = Number(rating);
+                review.comment = comment;
+
+                // Recalculate average rating
+                part.rating =
+                    part.reviews.reduce((acc, item) => item.rating + acc, 0) /
+                    part.reviews.length;
+
+                await part.save();
+                res.json({ message: 'Review updated' });
+            } else {
+                res.status(404).json({ message: 'Review not found' });
+            }
+        } else {
+            res.status(404).json({ message: 'Part not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Get all reviews from all products (Admin only)
 // @route   GET /api/parts/admin/reviews
 // @access  Private/Admin
@@ -239,9 +282,9 @@ const updateReviewReply = async (req, res) => {
     }
 };
 
-// @desc    Delete review (Admin only)
+// @desc    Delete review
 // @route   DELETE /api/parts/:partId/reviews/:reviewId
-// @access  Private/Admin
+// @access  Private
 const deleteReview = async (req, res) => {
     try {
         const part = await AutoPart.findById(req.params.partId);
@@ -249,6 +292,11 @@ const deleteReview = async (req, res) => {
         if (part) {
             const review = part.reviews.id(req.params.reviewId);
             if (review) {
+                // Check if user is admin or the owner
+                if (!req.user.isAdmin && review.user.toString() !== req.user._id.toString()) {
+                    return res.status(401).json({ message: 'Not authorized to delete this review' });
+                }
+
                 // Use pull method to remove subdocument
                 part.reviews.pull(req.params.reviewId);
                 
@@ -293,6 +341,7 @@ module.exports = {
     deletePart,
     getAdminStats,
     createPartReview,
+    updateUserReview,
     getAdminReviews,
     updateReviewReply,
     deleteReview,

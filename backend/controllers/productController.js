@@ -201,6 +201,123 @@ const getAdminStats = async (req, res) => {
     }
 };
 
+// @desc    Create new review
+// @route   POST /api/products/:id/reviews
+// @access  Private
+const createProductReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const product = await AutoPart.findById(req.params.id);
+
+        if (product) {
+            const alreadyReviewed = product.reviews.find(
+                (r) => r.user.toString() === req.user._id.toString()
+            );
+
+            if (alreadyReviewed) {
+                return res.status(400).json({ message: 'Product already reviewed' });
+            }
+
+            const review = {
+                name: req.user.name,
+                rating: Number(rating),
+                comment,
+                user: req.user._id,
+            };
+
+            product.reviews.push(review);
+            product.numReviews = product.reviews.length;
+            product.rating =
+                product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+                product.reviews.length;
+
+            await product.save();
+            res.status(201).json({ message: 'Review added' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Update user review
+// @route   PUT /api/products/:id/reviews/:reviewId
+// @access  Private
+const updateProductReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const product = await AutoPart.findById(req.params.id);
+
+        if (product) {
+            const review = product.reviews.id(req.params.reviewId);
+            
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' });
+            }
+
+            // Check ownership
+            if (review.user.toString() !== req.user._id.toString()) {
+                return res.status(401).json({ message: 'Not authorized to update this review' });
+            }
+
+            // Check admin response condition
+            if (review.reply) {
+                return res.status(400).json({ message: 'Cannot edit review after admin response' });
+            }
+
+            review.rating = Number(rating);
+            review.comment = comment;
+
+            product.rating =
+                product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+                product.reviews.length;
+
+            await product.save();
+            res.json({ message: 'Review updated' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete review
+// @route   DELETE /api/products/:id/reviews/:reviewId
+// @access  Private
+const deleteProductReview = async (req, res) => {
+    try {
+        const product = await AutoPart.findById(req.params.id);
+
+        if (product) {
+            const review = product.reviews.id(req.params.reviewId);
+            if (!review) {
+                return res.status(404).json({ message: 'Review not found' });
+            }
+
+            if (!req.user.isAdmin && review.user.toString() !== req.user._id.toString()) {
+                return res.status(401).json({ message: 'Not authorized' });
+            }
+
+            product.reviews.pull(req.params.reviewId);
+            product.numReviews = product.reviews.length;
+            if (product.numReviews > 0) {
+                product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+            } else {
+                product.rating = 0;
+            }
+
+            await product.save();
+            res.json({ message: 'Review deleted' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getProducts,
     getProductById,
@@ -208,4 +325,7 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getAdminStats,
+    createProductReview,
+    updateProductReview,
+    deleteProductReview,
 };
