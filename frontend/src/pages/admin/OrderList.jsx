@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../services/orderService';
-import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel } from '../../lib/exportExcel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,6 +26,24 @@ const OrderList = () => {
         };
         loadOrders();
     }, []);
+
+    const handleExportExcel = () => {
+        const dataToExport = orders.map((order) => ({
+            'Mã đơn hàng': order._id.toUpperCase(),
+            'Ngày đặt': new Date(order.createdAt).toLocaleString('vi-VN'),
+            'Khách hàng': order.shippingAddress?.name || order.user?.name || 'N/A',
+            'Email': order.shippingAddress?.email || order.user?.email || 'N/A',
+            'Số điện thoại': order.shippingAddress?.phone || 'N/A',
+            'Địa chỉ': order.shippingAddress?.address || 'N/A',
+            'Thành phố': order.shippingAddress?.city || 'N/A',
+            'Tổng tiền (VNĐ)': order.totalPrice,
+            'Phương thức': order.paymentMethod,
+            'Thanh toán': order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán',
+            'Trạng thái': order.status,
+        }));
+
+        exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
+    };
 
     const getStatusBadge = (status) => {
         switch (status) {
@@ -50,6 +69,13 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
+                <Button 
+                    onClick={handleExportExcel}
+                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 rounded-xl h-12 shadow-lg shadow-green-900/20"
+                    disabled={orders.length === 0}
+                >
+                    <FileSpreadsheet size={18} /> Xuất Excel
+                </Button>
             </div>
 
             {error && (

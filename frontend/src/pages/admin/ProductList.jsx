@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { fetchProducts, deleteProduct, fetchCategories } from '../../services/productService';
 import {
     Plus, Pencil, Trash2, Loader2, Search, ChevronLeft, ChevronRight,
-    AlertCircle, SlidersHorizontal, PackageX, Eye
+    AlertCircle, SlidersHorizontal, PackageX, Eye, FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel } from '../../lib/exportExcel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -76,6 +77,22 @@ const ProductList = () => {
         }
     };
 
+    const handleExportExcel = () => {
+        const dataToExport = products.map((product) => ({
+            'Mã sản phẩm': product._id.toUpperCase(),
+            'Tên sản phẩm': product.name,
+            'SKU': product.sku || 'N/A',
+            'Danh mục': product.category?.name || 'N/A',
+            'Thương hiệu': product.brand || 'N/A',
+            'Giá (VNĐ)': product.price,
+            'Tồn kho': product.stock,
+            'Trạng thái': product.isActive ? 'Hiển thị' : 'Ẩn',
+            'Ngày tạo': new Date(product.createdAt).toLocaleString('vi-VN'),
+        }));
+
+        exportToExcel(dataToExport, `Danh_sach_san_pham_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'SanPham');
+    };
+
     return (
         <div className="animate-fade-in pb-12 text-white/90">
             {/* Header */}
@@ -86,11 +103,21 @@ const ProductList = () => {
                         Tổng cộng <span className="text-white font-medium">{total}</span> sản phẩm
                     </p>
                 </div>
-                <Button asChild className="bg-white text-black hover:bg-slate-200">
-                    <Link to="/admin/products/create">
-                        <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
-                    </Link>
-                </Button>
+                <div className="flex gap-3">
+                    <Button 
+                        onClick={handleExportExcel}
+                        variant="outline"
+                        className="bg-transparent border-green-600/50 text-green-400 hover:bg-green-600/10 flex items-center gap-2"
+                        disabled={products.length === 0}
+                    >
+                        <FileSpreadsheet size={16} /> Xuất Excel
+                    </Button>
+                    <Button asChild className="bg-white text-black hover:bg-slate-200">
+                        <Link to="/admin/products/create">
+                            <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Alerts */}
