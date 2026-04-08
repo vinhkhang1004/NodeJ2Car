@@ -1,5 +1,7 @@
 const Order = require('../models/Order.js');
 const AutoPart = require('../models/AutoPart.js');
+const sendEmail = require('../utils/sendEmail.js');
+const { generateExcel } = require('../utils/excel.js');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -27,7 +29,11 @@ const addOrderItems = async (req, res) => {
                 _id: undefined,
             })),
             user: req.user._id,
-            shippingAddress,
+            shippingAddress: {
+                ...shippingAddress,
+                country: shippingAddress.country || 'Việt Nam',
+            },
+
             paymentMethod,
             itemsPrice,
             taxPrice,
@@ -139,14 +145,50 @@ const updateOrderStatus = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (order) {
+        const oldStatus = order.status;
         order.status = req.body.status || order.status;
         const updatedOrder = await order.save();
+
+        // Send email if status changed
+        if (oldStatus !== updatedOrder.status) {
+            const recipientEmail = updatedOrder.shippingAddress.email;
+            const recipientName = updatedOrder.shippingAddress.name;
+            const statusLabels = {
+                'Processing': 'Đang xử lý',
+                'Shipped': 'Đang vận chuyển',
+                'Delivered': 'Đã giao hàng',
+                'Cancelled': 'Đã hủy'
+            };
+
+            await sendEmail({
+                email: recipientEmail,
+                subject: `Cập nhật trạng thái đơn hàng #${updatedOrder._id}`,
+                message: `Xin chào ${recipientName}, trạng thái đơn hàng #${updatedOrder._id} của bạn đã được cập nhật thành: ${statusLabels[updatedOrder.status] || updatedOrder.status}.`,
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; color: #1e293b; background-color: #f8fafc;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <h2 style="color: #0f172a; margin-bottom: 24px;">Thông báo cập nhật đơn hàng</h2>
+                            <p>Xin chào <strong>${recipientName}</strong>,</p>
+                            <p>Chúng tôi xin thông báo trạng thái đơn hàng <strong>#${updatedOrder._id}</strong> của bạn đã thay đổi:</p>
+                            <div style="display: inline-block; padding: 12px 24px; background-color: #f97316; color: white; border-radius: 8px; font-weight: bold; margin: 20px 0;">
+                                ${statusLabels[updatedOrder.status] || updatedOrder.status}
+                            </div>
+                            <p>Cảm ơn bạn đã tin tưởng và lựa chọn J2AutoParts.</p>
+                            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+                            <p style="font-size: 12px; color: #64748b;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                        </div>
+                    </div>
+                `
+            });
+        }
+
         res.json(updatedOrder);
     } else {
         res.status(404);
         throw new Error('Order not found');
     }
 };
+
 
 // @desc    Get admin dashboard stats (orders + revenue)
 // @route   GET /api/orders/dashboard
@@ -220,6 +262,68 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
+// Xuất danh sách hóa đơn (Orders)
+const exportOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate('user', 'name email')
+      .populate('orderItems.product', 'name sku')
+      .sort({ createdAt: -1 });
+
+    // Chuẩn bị dữ liệu cho Excel
+    const excelData = orders.map(order => ({
+      'Mã đơn': order._id,
+      'Khách hàng': order.user?.name || 'N/A',
+      'Email': order.user?.email || 'N/A',
+      'Tổng tiền': order.totalPrice,
+      'Trạng thái': order.orderStatus,
+      'Ngày tạo': order.createdAt.toLocaleDateString('vi-VN'),
+      'Sản phẩm': order.orderItems.map(item => `${item.product?.name} (x${item.qty})`).join(', ')
+    }));
+
+    const { buffer, fileName } = generateExcel(excelData, 'Hóa đơn', 'orders.xlsx');
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Xuất doanh thu (Revenue)
+const exportRevenue = async (req, res) => {
+  try {
+    // Tính doanh thu theo tháng (ví dụ: tổng doanh thu từ orders đã giao)
+    const revenueData = await Order.aggregate([
+      { $match: { orderStatus: 'Delivered' } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+          totalRevenue: { $sum: '$totalPrice' },
+          orderCount: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id': -1 } }
+    ]);
+
+    // Chuẩn bị dữ liệu cho Excel
+    const excelData = revenueData.map(item => ({
+      'Tháng': item._id,
+      'Tổng doanh thu': item.totalRevenue,
+      'Số đơn hàng': item.orderCount
+    }));
+
+    const { buffer, fileName } = generateExcel(excelData, 'Doanh thu', 'revenue.xlsx');
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
     addOrderItems,
     getOrderById,
@@ -229,4 +333,6 @@ module.exports = {
     getOrders,
     updateOrderStatus,
     getDashboardStats,
+    exportOrders,
+    exportRevenue,
 };

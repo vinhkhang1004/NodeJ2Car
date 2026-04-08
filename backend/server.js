@@ -17,7 +17,15 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://j2autoparts.web.app',
+    'https://j2autoparts.firebaseapp.com'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Mount Routes

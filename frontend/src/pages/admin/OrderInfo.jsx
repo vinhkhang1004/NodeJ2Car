@@ -98,10 +98,10 @@ const OrderInfo = () => {
                             <SelectValue placeholder="Trạng thái" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#18181b] border-slate-700 text-white">
-                            <SelectItem value="Processing">Chờ xử lý</SelectItem>
+                            <SelectItem value="Processing">Đang xử lý</SelectItem>
                             <SelectItem value="Shipped">Đang giao</SelectItem>
                             <SelectItem value="Delivered">Đã giao</SelectItem>
-                            <SelectItem value="Cancelled">Đã huỷ</SelectItem>
+                            <SelectItem value="Cancelled">Đã hủy</SelectItem>
                         </SelectContent>
                     </Select>
                     {!order.isDelivered && (
@@ -201,14 +201,17 @@ const OrderInfo = () => {
                         </CardHeader>
                         <CardContent className="pt-6 space-y-4">
                            <div>
+                               <p className="text-white font-bold mb-1">{order.shippingAddress?.name}</p>
+                               <p className="text-slate-400 text-xs mb-3 italic">{order.shippingAddress?.email}</p>
                                <p className="text-slate-300 mb-1 leading-relaxed">{order.shippingAddress?.address}</p>
                                <p className="text-slate-300 font-medium">{order.shippingAddress?.city}, {order.shippingAddress?.country}</p>
                            </div>
                            <div className="pt-4 border-t border-slate-800/50">
-                               <p className="text-slate-400 text-xs mb-1">Số điện thoại</p>
+                               <p className="text-slate-400 text-xs mb-1">Số điện thoại liên hệ</p>
                                <p className="text-white font-mono">{order.shippingAddress?.phone}</p>
                            </div>
                         </CardContent>
+
                     </Card>
 
                     {/* Payment Status */}

@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { fetchProducts, deleteProduct, fetchCategories } from '../../services/productService';
 import {
     Plus, Pencil, Trash2, Loader2, Search, ChevronLeft, ChevronRight,
-    AlertCircle, SlidersHorizontal, PackageX, Eye
+    AlertCircle, SlidersHorizontal, PackageX, Eye, FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel } from '../../lib/exportExcel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -62,6 +63,23 @@ const ProductList = () => {
         loadProducts();
     };
 
+    const handleExportExcel = () => {
+        const dataToExport = products.map(p => ({
+            'ID Sản phẩm': p._id,
+            'Mã SKU': p.sku || 'N/A',
+            'Tên sản phẩm': p.name,
+            'Thương hiệu': p.brand || 'N/A',
+            'Danh mục': typeof p.category === 'object' ? p.category?.name : (p.category || 'N/A'),
+            'Giá niêm yết (VNĐ)': p.price,
+            'Tồn kho': p.stock,
+            'Trạng thái': p.isActive ? 'Hiển thị' : 'Ẩn',
+            'Mô tả': p.description,
+            'Ngày tạo': new Date(p.createdAt).toLocaleDateString('vi-VN')
+        }));
+
+        exportToExcel(dataToExport, `Danh_sach_san_pham_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'SanPham');
+    };
+
     const handleDelete = async (id, name) => {
         if (!window.confirm(`Xác nhận xoá sản phẩm "${name}"?`)) return;
         try {
@@ -86,11 +104,20 @@ const ProductList = () => {
                         Tổng cộng <span className="text-white font-medium">{total}</span> sản phẩm
                     </p>
                 </div>
-                <Button asChild className="bg-white text-black hover:bg-slate-200">
-                    <Link to="/admin/products/create">
-                        <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
-                    </Link>
-                </Button>
+                <div className="flex gap-2">
+                    <Button 
+                        onClick={handleExportExcel} 
+                        variant="outline" 
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10"
+                    >
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel
+                    </Button>
+                    <Button asChild className="bg-white text-black hover:bg-slate-200">
+                        <Link to="/admin/products/create">
+                            <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Alerts */}

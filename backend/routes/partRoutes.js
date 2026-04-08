@@ -6,12 +6,28 @@ const {
     createPart,
     updatePart,
     deletePart,
-    getAdminStats
+    getAdminStats,
+    createPartReview,
+    updateUserReview,
+    getAdminReviews,
+    updateReviewReply,
+    deleteReview,
+    getBrands,
 } = require('../controllers/partController.js');
 const { protect, admin } = require('../middleware/authMiddleware.js');
 
 router.route('/').get(getParts).post(protect, admin, createPart);
+router.route('/brands').get(getBrands);
 router.route('/admin/stats').get(protect, admin, getAdminStats);
+
+router.route('/admin/reviews').get(protect, admin, getAdminReviews);
+router.route('/:id/reviews').post(protect, createPartReview);
+router.route('/:partId/reviews/:reviewId/reply').post(protect, admin, updateReviewReply);
+router.route('/:partId/reviews/:reviewId')
+    .put(protect, updateUserReview)
+    .delete(protect, deleteReview);
+
+
 router.route('/:id')
     .get(getPartById)
     .put(protect, admin, updatePart)

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, ArrowUpRight } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { getFileUrl } from '../lib/utils';
+import Rating from './Rating';
+
 
 const PartCard = ({ part }) => {
   const { addToCart } = useContext(CartContext);
@@ -46,12 +48,16 @@ const PartCard = ({ part }) => {
           <h3 className="text-lg font-black text-blue-950 mb-1 leading-tight group-hover:text-blue-700 transition-colors">
             {part.name}
           </h3>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{part.brand}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{part.brand}</p>
+            <Rating value={part.rating} text={`${part.numReviews}`} />
+          </div>
         </div>
 
         <p className="text-slate-500 text-sm mb-6 line-clamp-2 h-10">
           {part.description}
         </p>
+
 
         {/* Pricing & Logic */}
         <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
