@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
     User, Phone, MapPin, Building, Globe, Navigation, 
-    ArrowRight, CheckCircle, Star, Plus
+    ArrowRight, CheckCircle, Star, Plus, Mail
 } from 'lucide-react';
 
 const Shipping = () => {
@@ -22,25 +22,23 @@ const Shipping = () => {
 
     const [name, setName] = useState(shippingAddress.name || user?.name || '');
     const [phone, setPhone] = useState(shippingAddress.phone || user?.phone || '');
+    const [email, setEmail] = useState(shippingAddress.email || user?.email || '');
     const [address, setAddress] = useState(shippingAddress.address || user?.address || '');
     const [city, setCity] = useState(shippingAddress.city || user?.city || '');
-    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || user?.postalCode || '');
-    const [country, setCountry] = useState(shippingAddress.country || user?.country || '');
 
     const handleSelectSaved = (addr) => {
         setSelectedAddressId(addr._id);
         setName(addr.name);
         setPhone(addr.phone);
+        setEmail(addr.email || user?.email || '');
         setAddress(addr.address);
         setCity(addr.city);
-        setCountry(addr.country);
-        setPostalCode(addr.postalCode || '');
         setUseManual(false);
     };
 
     const submitHandler = (e) => {
         if (e && e.preventDefault) e.preventDefault();
-        saveShippingAddress({ name, phone, address, city, postalCode, country });
+        saveShippingAddress({ name, phone, email, address, city });
         navigate('/payment');
     };
 
@@ -125,39 +123,32 @@ const Shipping = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
+                                <Label className="text-slate-400">Email nhận thông báo</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@mail.com" className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" required />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
                                 <Label className="text-slate-400">Địa chỉ cụ thể</Label>
                                 <div className="relative">
                                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                                     <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Số nhà, tên đường..." className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" required />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-5">
-                                <div className="space-y-2">
-                                    <Label className="text-slate-400">Thành phố</Label>
-                                    <div className="relative">
-                                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                        <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="VD: Hà Nội" className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" required />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-slate-400">Mã bưu chính</Label>
-                                    <div className="relative">
-                                        <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                        <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="10000" className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-slate-400">Quốc gia</Label>
+                            <div className="space-y-4">
+                                <Label className="text-slate-400">Thành phố</Label>
                                 <div className="relative">
-                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                    <Input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Việt Nam" className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" required />
+                                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                    <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="VD: Hà Nội" className="pl-10 h-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl" required />
                                 </div>
                             </div>
+
                             <Button type="submit" className="w-full bg-white text-black hover:bg-slate-200 h-14 rounded-2xl font-bold text-lg mt-6 shadow-xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
                                 Tiếp tục thanh toán <ArrowRight size={20} className="ml-2" />
                             </Button>
                         </form>
+
                     )}
 
                     {/* Confirm saved address button */}
