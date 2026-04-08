@@ -31,6 +31,12 @@ const Shop = () => {
         page: Number(searchParams.get('page')) || 1
     });
 
+    // Local state for price inputs to avoid immediate re-fetching
+    const [localPrice, setLocalPrice] = useState({
+        min: searchParams.get('minPrice') || '',
+        max: searchParams.get('maxPrice') || ''
+    });
+
     // Fetch dynamic categories and brands
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -57,7 +63,25 @@ const Shop = () => {
             maxPrice: searchParams.get('maxPrice') || '',
             page: Number(searchParams.get('page')) || 1
         });
+        setLocalPrice({
+            min: searchParams.get('minPrice') || '',
+            max: searchParams.get('maxPrice') || ''
+        });
     }, [searchParams]);
+
+    const applyPriceFilter = () => {
+        const updatedFilters = { 
+            ...filters, 
+            minPrice: localPrice.min, 
+            maxPrice: localPrice.max,
+            page: 1 
+        };
+        const cleanParams = {};
+        Object.entries(updatedFilters).forEach(([k, v]) => {
+            if (v) cleanParams[k] = v;
+        });
+        setSearchParams(cleanParams);
+    };
 
 
     useEffect(() => {
@@ -168,6 +192,43 @@ const Shop = () => {
                                             </span>
                                         </label>
                                     ))}
+                                </div>
+                            </div>
+
+                            {/* Price Filter */}
+                            <div>
+                                <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6 border-b border-slate-50 pb-2">
+                                    Khoảng Giá (VND)
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="space-y-2">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Từ giá</p>
+                                            <input 
+                                                type="number" 
+                                                placeholder="0"
+                                                value={localPrice.min}
+                                                onChange={(e) => setLocalPrice({ ...localPrice, min: e.target.value })}
+                                                className="w-full bg-slate-50 border border-slate-100 p-2 text-[11px] font-bold text-blue-950 outline-none focus:border-blue-950 transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Đến giá</p>
+                                            <input 
+                                                type="number" 
+                                                placeholder="Max"
+                                                value={localPrice.max}
+                                                onChange={(e) => setLocalPrice({ ...localPrice, max: e.target.value })}
+                                                className="w-full bg-slate-50 border border-slate-100 p-2 text-[11px] font-bold text-blue-950 outline-none focus:border-blue-950 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={applyPriceFilter}
+                                        className="w-full py-3 bg-blue-950 text-white text-[10px] font-black uppercase tracking-widest rounded-sm shadow-lg shadow-blue-900/10 hover:bg-blue-900 transition-all"
+                                    >
+                                        Lọc theo giá
+                                    </button>
                                 </div>
                             </div>
 
@@ -301,6 +362,32 @@ const Shop = () => {
                                                 </span>
                                             </label>
                                         ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-50 pb-2">Khoảng Giá (VND)</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Từ</p>
+                                            <input 
+                                                type="number" 
+                                                placeholder="0"
+                                                value={localPrice.min}
+                                                onChange={(e) => setLocalPrice({ ...localPrice, min: e.target.value })}
+                                                className="w-full bg-slate-50 border border-slate-100 p-3 text-xs font-bold text-blue-950 outline-none focus:border-blue-950 transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Đến</p>
+                                            <input 
+                                                type="number" 
+                                                placeholder="Max"
+                                                value={localPrice.max}
+                                                onChange={(e) => setLocalPrice({ ...localPrice, max: e.target.value })}
+                                                className="w-full bg-slate-50 border border-slate-100 p-3 text-xs font-bold text-blue-950 outline-none focus:border-blue-950 transition-colors"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
