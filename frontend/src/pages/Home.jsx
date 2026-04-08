@@ -9,27 +9,53 @@ import {
     ArrowRight 
 } from 'lucide-react';
 import PartCard from '../components/PartCard';
+import { getFileUrl } from '../lib/utils';
+
+const CATEGORY_IMAGE_MAPPING = {
+    'động cơ': 'https://images.unsplash.com/photo-1627581335044-88981f3b2dbf?q=80&w=1200&auto=format&fit=crop',
+    'nội thất': 'https://images.unsplash.com/photo-1549402129-efb1338006e8?auto=format&fit=crop&q=80&w=1000',
+    'ngoại thất': 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&q=80&w=1000',
+    'hiệu suất': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1000',
+    'hiệu xuất': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1000',
+    'phanh': 'https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&q=80&w=1000',
+    'lốp & mâm': 'https://images.unsplash.com/photo-1550920425-415843b092a9?auto=format&fit=crop&q=80&w=1000'
+};
+
+const getCategoryImage = (cat) => {
+    if (cat.imageUrl && !cat.imageUrl.includes('No Image')) return getFileUrl(cat.imageUrl);
+    
+    // Fallback to mapping based on name
+    const lowerName = (cat.name || '').toLowerCase();
+    return CATEGORY_IMAGE_MAPPING[lowerName] || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1200&auto=format&fit=crop';
+};
 
 const Home = () => {
     const [parts, setParts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchParts = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                // Fetch only first 8 parts for "Featured" section on landing page
-                const { data } = await api.get('/parts?limit=8');
-                setParts(data.parts);
+                // Fetch featured parts and active categories in parallel
+                const [partsRes, catsRes] = await Promise.all([
+                    api.get('/parts?limit=8'),
+                    api.get('/categories?active=true')
+                ]);
+                
+                setParts(partsRes.data.parts || []);
+                // Take the first 4 categories for the home grid
+                setCategories(catsRes.data.slice(0, 4) || []);
             } catch (err) {
-                console.error('Error fetching featured parts:', err);
+                console.error('Error fetching home data:', err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchParts();
+        fetchData();
     }, []);
 
     const handleSearch = (e) => {
@@ -40,7 +66,13 @@ const Home = () => {
     };
 
     const handleCategoryClick = (category) => {
-        navigate(`/shop?category=${category}`);
+        // Use ID for dynamic categories, or standard name for fallback
+        const catValue = category._id || category.name || category;
+        navigate(`/shop?category=${catValue}`);
+    };
+
+    const imageFallback = (e) => {
+        e.target.src = 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop';
     };
 
     return (
@@ -49,9 +81,10 @@ const Home = () => {
             <div className="relative bg-[#080b14] text-white overflow-hidden py-32 flex items-center justify-center min-h-[600px]">
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1600&auto=format&fit=crop" 
-                        alt="Engine Block" 
+                        src={getFileUrl('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop')} 
+                        alt="Background" 
                         className="w-full h-full object-cover opacity-30 mix-blend-screen"
+                        onError={imageFallback}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080b14] via-[#080b14]/50 to-transparent" />
                 </div>
@@ -110,75 +143,53 @@ const Home = () => {
             <div id="categories" className="max-w-7xl mx-auto py-24 px-6 md:px-12 bg-white">
                 <div className="flex justify-between items-end mb-12">
                     <div className="max-w-xl">
-                        <h2 className="text-3xl lg:text-4xl font-black text-blue-950 mb-4 tracking-tight">Danh Mục Kỹ Thuật</h2>
+                        <h2 className="text-3xl lg:text-4xl font-black text-blue-950 mb-4 tracking-tight uppercase italic underline decoration-orange-500 decoration-4 underline-offset-8">Danh Mục Kỹ Thuật</h2>
                         <p className="text-slate-500 font-medium leading-relaxed text-sm">Tuyển tập các linh kiện được thiết kế riêng biệt để tối ưu hóa hiệu suất và độ bền cho chiếc xe của bạn.</p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto">
-                    <div onClick={() => handleCategoryClick('Động Cơ')} className="relative rounded-2xl overflow-hidden bg-slate-900 group cursor-pointer h-[350px]">
-                        <img src="https://images.unsplash.com/photo-1627581335044-88981f3b2dbf?q=80&w=1200&auto=format&fit=crop" alt="Động Cơ" className="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-orange-600/90 transition-colors duration-700" />
-                        <div className="absolute bottom-10 left-10 text-white z-10">
-                            <p className="text-orange-500 font-black text-[10px] uppercase tracking-[0.3em] mb-2 leading-none">Phân khúc cao cấp</p>
-                            <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4">Động Cơ</h3>
-                            <button className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-white/50 hover:border-white transition-all pb-1 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-500">
-                                Xem tất cả
-                            </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {categories.length > 0 ? categories.map((cat, idx) => (
+                        <div 
+                            key={cat._id} 
+                            onClick={() => handleCategoryClick(cat)} 
+                            className={`relative rounded-2xl overflow-hidden bg-slate-900 group cursor-pointer h-[400px] transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-orange-500/20`}
+                        >
+                            <img 
+                                src={getCategoryImage(cat)} 
+                                alt={cat.name} 
+                                className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all duration-1000" 
+                                onError={imageFallback}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-orange-600/60 transition-colors duration-700" />
+                            <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                                <p className="text-orange-500 font-black text-[10px] uppercase tracking-[0.3em] mb-2 leading-none">Phân khúc {idx % 2 === 0 ? 'cao cấp' : 'hiệu năng'}</p>
+                                <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-4 leading-tight">{cat.name}</h3>
+                                <div className="w-8 h-1 bg-white/30 group-hover:w-full group-hover:bg-white transition-all duration-500 mb-4" />
+                                <button className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                                    Khám phá ngay <ArrowRight size={14} />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className="md:col-span-1 md:row-span-2 relative group overflow-hidden bg-slate-900 cursor-pointer min-h-[500px]">
-                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1000" className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-1000" alt="Performance" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-orange-600/90 transition-colors duration-700" />
-                        <div className="absolute bottom-12 left-12 text-white z-10 pr-12">
-                            <p className="text-orange-500 font-black text-xs uppercase tracking-[0.4em] mb-4 leading-none">Đỉnh cao hiệu năng</p>
-                            <h3 className="text-6xl font-black uppercase italic tracking-tighter mb-6 leading-none">Hiệu Suất</h3>
-                            <p className="text-slate-300 text-sm mb-10 max-w-xs font-medium leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-y-4 group-hover:translate-y-0 transition-transform">
-                                Linh kiện nâng cấp giúp tối ưu hóa công suất và trải nghiệm lái xe thuần túy nhất.
-                            </p>
-                            <button onClick={() => navigate('/shop?category=Hiệu Suất')} className="bg-white text-black px-10 py-4 rounded-sm font-black text-[10px] uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all duration-500 shadow-2xl">
-                                Vào Cửa Hàng
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="group relative overflow-hidden bg-slate-900 aspect-square cursor-pointer">
-                        <img src="https://images.unsplash.com/photo-1549402129-efb1338006e8?auto=format&fit=crop&q=80&w=1000" className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-1000" alt="Interior" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-orange-600/90 transition-colors duration-700" />
-                        <div className="absolute bottom-10 left-10 text-white z-10">
-                            <p className="text-orange-500 font-black text-[10px] uppercase tracking-[0.3em] mb-2 leading-none">Tinh tế & Sang trọng</p>
-                            <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4">Nội Thất</h3>
-                            <button onClick={() => navigate('/shop?category=Nội Thất')} className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-white/50 hover:border-white transition-all pb-1 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-500">
-                                Xem tất cả
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="group relative overflow-hidden bg-slate-900 aspect-square cursor-pointer">
-                        <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&q=80&w=1000" className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-1000" alt="Exterior" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent group-hover:from-orange-600/90 transition-colors duration-700" />
-                        <div className="absolute bottom-10 left-10 text-white z-10">
-                            <p className="text-orange-500 font-black text-[10px] uppercase tracking-[0.3em] mb-2 leading-none">Kiến tạo phong cách</p>
-                            <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4">Ngoại Thất</h3>
-                            <button onClick={() => navigate('/shop?category=Ngoại Thất')} className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-white/50 hover:border-white transition-all pb-1 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 duration-500">
-                                Xem tất cả
-                            </button>
-                        </div>
-                    </div>
+                    )) : (
+                        // Fallback skeletons if no categories found
+                        [1,2,3,4].map(n => (
+                            <div key={n} className="bg-slate-100 h-[400px] rounded-2xl animate-pulse" />
+                        ))
+                    )}
                 </div>
             </div>
 
             <div className="bg-slate-50 py-24 px-6 md:px-12 border-y border-slate-100">
-                <div className="max-w-[1440px] mx-auto px-6 md:px-12">
-                    <div className="flex justify-between items-end mb-12">
+                <div className="max-w-[1440px] mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
                         <div>
                             <p className="text-orange-500 font-black text-[10px] uppercase tracking-[0.5em] mb-4">Bộ sưu tập phụ tùng</p>
-                            <h2 className="text-5xl md:text-6xl font-black text-[#0f172a] uppercase tracking-tighter italic">Sản Phẩm <span className="text-slate-300">Nổi Bật</span></h2>
+                            <h2 className="text-5xl md:text-7xl font-black text-blue-950 tracking-tighter uppercase italic">Sản Phẩm <span className="text-slate-300">Nổi Bật</span></h2>
                         </div>
                         <Link 
                             to="/shop" 
-                            className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-slate-900 pb-1 hover:text-orange-500 hover:border-orange-500 transition-all duration-300"
+                            className="bg-blue-950 text-white px-8 py-4 rounded-sm text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 transition-all duration-300 shadow-xl shadow-blue-900/10"
                         >
                             Xem tất cả cửa hàng
                         </Link>
@@ -204,36 +215,41 @@ const Home = () => {
             <div className="max-w-7xl mx-auto py-32 px-6 md:px-12 bg-white">
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
                     <div className="order-2 lg:order-1">
-                        <h2 className="text-4xl lg:text-5xl font-black text-[#0f172a] mb-14 leading-[1.1] tracking-tighter uppercase font-outfit">
-                            TIÊU CHUẨN <br/> KỸ THUẬT SỐ
+                        <h2 className="text-4xl lg:text-5xl font-black text-[#0f172a] mb-14 leading-[1.1] tracking-tighter uppercase">
+                            TIÊU CHUẨN <br/> <span className="text-orange-500">KỸ THUẬT SỐ</span>
                         </h2>
                         
                         <div className="space-y-12">
                             <div className="flex gap-6 group">
-                                <div className="w-14 h-14 rounded-xl bg-blue-900 flex items-center justify-center text-white shrink-0 shadow-xl shadow-blue-900/30 group-hover:shadow-orange-500/20 group-hover:-translate-y-1 transition-all">
+                                <div className="w-14 h-14 rounded-xl bg-blue-950 flex items-center justify-center text-white shrink-0 shadow-xl shadow-blue-950/20 group-hover:bg-orange-500 transition-all">
                                     <FastForward size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-black text-slate-800 mb-2">Giao Hàng Hỏa Tốc</h3>
+                                    <h3 className="text-lg font-black text-blue-950 mb-2">Giao Hàng Hỏa Tốc</h3>
                                     <p className="text-slate-500 text-sm leading-relaxed font-medium">Chúng tôi hiểu thời gian là vàng. Mạng lưới logistics tối ưu đảm bảo linh kiện đến tay bạn nhanh nhất có thể.</p>
                                 </div>
                             </div>
                             
                             <div className="flex gap-6 group">
-                                <div className="w-14 h-14 rounded-xl bg-blue-900 flex items-center justify-center text-white shrink-0 shadow-xl shadow-blue-900/30 group-hover:shadow-orange-500/20 group-hover:-translate-y-1 transition-all">
+                                <div className="w-14 h-14 rounded-xl bg-blue-950 flex items-center justify-center text-white shrink-0 shadow-xl shadow-blue-950/20 group-hover:bg-orange-500 transition-all">
                                     <Headphones size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-black text-slate-800 mb-2">Chuyên Gia Hỗ Trợ 24/7</h3>
+                                    <h3 className="text-lg font-black text-blue-950 mb-2">Chuyên Gia Hỗ Trợ 24/7</h3>
                                     <p className="text-slate-500 text-sm leading-relaxed font-medium">Đội ngũ kỹ sư cơ khí luôn sẵn sàng tư vấn kỹ thuật chuyên sâu để bạn nhận đúng mã phụ tùng.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="relative rounded-sm overflow-hidden shadow-2xl h-[500px] lg:h-[700px] order-1 lg:order-2 group">
-                        <img src="https://images.unsplash.com/photo-1596547605668-3eedaac199ca?q=80&w=1000&auto=format&fit=crop" alt="Engineer checking part" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s]" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl h-[500px] lg:h-[600px] order-1 lg:order-2 group">
+                        <img 
+                            src={getFileUrl('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000&auto=format&fit=crop')} 
+                            alt="Engineer checking part" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s]" 
+                            onError={imageFallback}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent"></div>
                     </div>
                 </div>
             </div>
