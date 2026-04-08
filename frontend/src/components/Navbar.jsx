@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X } from 'lucide-react';
+import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X, Heart } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout, wishlist } = useContext(AuthContext);
     const { cartCount } = useContext(CartContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -116,6 +116,17 @@ const Navbar = () => {
                         <button onClick={() => navigate('/login')} className="w-9 h-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors shadow-sm">
                             <User size={16} />
                         </button>
+                    )}
+                    
+                    {user && (
+                        <Link to="/wishlist" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2">
+                            <Heart className={`text-[#0f172a] ${wishlist.length > 0 ? 'fill-red-500 text-red-500' : ''}`} size={24} />
+                            {wishlist.length > 0 && (
+                                <span className="absolute top-0 right-0 bg-red-600 text-white text-[9px] font-bold flex items-center justify-center rounded-full w-5 h-5 shadow-sm border border-white">
+                                    {wishlist.length}
+                                </span>
+                            )}
+                        </Link>
                     )}
                     
                     <Link to="/cart" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2">
