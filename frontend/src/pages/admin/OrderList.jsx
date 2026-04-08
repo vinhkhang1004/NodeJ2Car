@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../services/orderService';
+<<<<<<< Updated upstream
 import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
+=======
+import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { exportToExcel } from '../../lib/exportExcel';
+>>>>>>> Stashed changes
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +31,27 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
+<<<<<<< Updated upstream
+=======
+    const handleExportOrders = () => {
+        const dataToExport = orders.map(order => ({
+            'ID Đơn hàng': order._id,
+            'Khách hàng': order.shippingAddress?.name || order.user?.name || 'Ẩn danh',
+            'Số điện thoại': order.shippingAddress?.phone || '',
+            'Địa chỉ': `${order.shippingAddress?.address}, ${order.shippingAddress?.city}`,
+            'Ngày đặt': new Date(order.createdAt).toLocaleDateString('vi-VN'),
+            'Tổng tiền': order.totalPrice,
+            'Trạng thái': order.status === 'Processing' ? 'Đang xử lý' :
+                         order.status === 'Shipped' ? 'Đang giao' :
+                         order.status === 'Delivered' ? 'Đã giao' :
+                         order.status === 'Cancelled' ? 'Đã hủy' : order.status,
+            'Thanh toán': order.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'
+        }));
+
+        exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
+    };
+
+>>>>>>> Stashed changes
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
@@ -50,6 +76,18 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
+<<<<<<< Updated upstream
+=======
+                <div className="flex gap-2">
+                    <Button
+                        onClick={handleExportOrders}
+                        variant="outline"
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10"
+                    >
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel Đơn Hàng
+                    </Button>
+                </div>
+>>>>>>> Stashed changes
             </div>
 
             {error && (

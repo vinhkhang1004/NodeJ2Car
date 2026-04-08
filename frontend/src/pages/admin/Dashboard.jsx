@@ -150,6 +150,28 @@ const AdminDashboard = () => {
         return result;
     })();
 
+<<<<<<< Updated upstream
+=======
+    const handleExportRevenue = () => {
+        const dataToExport = chartData.map(d => ({
+            'Ngày': d.name,
+            'Doanh thu (VNĐ)': d.revenue,
+            'Số đơn hàng': d.orders
+        }));
+
+        const totalRevenue = dataToExport.reduce((acc, curr) => acc + curr['Doanh thu (VNĐ)'], 0);
+        const totalOrders = dataToExport.reduce((acc, curr) => acc + curr['Số đơn hàng'], 0);
+
+        dataToExport.push({
+            'Ngày': 'TỔNG CỘNG (30 ngày)',
+            'Doanh thu (VNĐ)': totalRevenue,
+            'Số đơn hàng': totalOrders
+        });
+
+        exportToExcel(dataToExport, `Bao_cao_doanh_thu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DoanhThu');
+    };
+
+>>>>>>> Stashed changes
     const statusMap = {};
     (stats?.statusCounts || []).forEach(s => { statusMap[s._id] = s.count; });
 
@@ -162,6 +184,16 @@ const AdminDashboard = () => {
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
+<<<<<<< Updated upstream
+=======
+                    <Button
+                        onClick={handleExportRevenue}
+                        variant="outline"
+                        className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10 rounded-xl h-10"
+                    >
+                        <FileSpreadsheet size={16} className="mr-2" /> Xuất doanh thu
+                    </Button>
+>>>>>>> Stashed changes
                     <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <ShoppingBag size={16} className="mr-2" /> Đơn hàng
                     </Button>
@@ -173,43 +205,14 @@ const AdminDashboard = () => {
 
             {/* Stat Cards */}
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard
-                    icon={DollarSign}
-                    title="Doanh thu tháng này"
-                    value={formatVND(stats?.thisMonthRevenue)}
-                    subValue={`Tổng: ${formatVND(stats?.totalRevenue)}`}
-                    trend={revTrend}
-                    color="bg-primary/20"
-                />
-                <StatCard
-                    icon={ShoppingBag}
-                    title="Đơn hàng tháng này"
-                    value={stats?.thisMonthOrders ?? 0}
-                    subValue={`Tổng: ${stats?.totalOrders ?? 0} đơn`}
-                    trend={orderTrend}
-                    color="bg-blue-500/20"
-                />
-                <StatCard
-                    icon={Package}
-                    title="Sản phẩm"
-                    value={productStats.totalProducts}
-                    subValue={productStats.lowStockProducts > 0 ? `⚠ ${productStats.lowStockProducts} sắp hết hàng` : `${productStats.totalCategories} danh mục`}
-                    trend={0}
-                    color="bg-purple-500/20"
-                />
-                <StatCard
-                    icon={Users}
-                    title="Khách hàng"
-                    value={productStats.totalUsers}
-                    subValue="Tổng tài khoản đăng ký"
-                    trend={0}
-                    color="bg-green-500/20"
-                />
+                <StatCard icon={DollarSign} title="Doanh thu tháng này" value={formatVND(stats?.thisMonthRevenue)} subValue={`Tổng: ${formatVND(stats?.totalRevenue)}`} trend={revTrend} color="bg-primary/20" />
+                <StatCard icon={ShoppingBag} title="Đơn hàng tháng này" value={stats?.thisMonthOrders ?? 0} subValue={`Tổng: ${stats?.totalOrders ?? 0} đơn`} trend={orderTrend} color="bg-blue-500/20" />
+                <StatCard icon={Package} title="Sản phẩm" value={productStats.totalProducts} subValue={productStats.lowStockProducts > 0 ? `⚠ ${productStats.lowStockProducts} sắp hết hàng` : `${productStats.totalCategories} danh mục`} trend={0} color="bg-purple-500/20" />
+                <StatCard icon={Users} title="Khách hàng" value={productStats.totalUsers} subValue="Tổng tài khoản đăng ký" trend={0} color="bg-green-500/20" />
             </div>
 
             {/* Revenue Chart + Order Status */}
             <div className="grid gap-6 lg:grid-cols-3">
-                {/* Revenue Chart */}
                 <Card className="lg:col-span-2 bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
                     <CardHeader className="border-b border-slate-800/50 pb-4">
                         <div className="flex items-center justify-between">
@@ -242,7 +245,6 @@ const AdminDashboard = () => {
                     </CardContent>
                 </Card>
 
-                {/* Order Status Breakdown */}
                 <Card className="bg-[#18181b] border-slate-800 shadow-xl shadow-black/20 overflow-hidden">
                     <CardHeader className="border-b border-slate-800/50 pb-4">
                         <CardTitle className="text-white text-lg flex items-center gap-2">
@@ -272,11 +274,9 @@ const AdminDashboard = () => {
                                 </div>
                             );
                         })}
-
                         {stats?.totalOrders === 0 && (
                             <p className="text-slate-600 text-sm text-center py-8">Chưa có đơn hàng nào</p>
                         )}
-
                         <div className="pt-2">
                             <Link to="/admin/orders" className="flex items-center justify-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
                                 Xem tất cả đơn hàng <ArrowRight size={14} />
