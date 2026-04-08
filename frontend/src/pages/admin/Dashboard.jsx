@@ -150,8 +150,6 @@ const AdminDashboard = () => {
         return result;
     })();
 
-<<<<<<< Updated upstream
-=======
     const handleExportRevenue = () => {
         const dataToExport = chartData.map(d => ({
             'Ngày': d.name,
@@ -170,8 +168,6 @@ const AdminDashboard = () => {
 
         exportToExcel(dataToExport, `Bao_cao_doanh_thu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DoanhThu');
     };
-
->>>>>>> Stashed changes
     const statusMap = {};
     (stats?.statusCounts || []).forEach(s => { statusMap[s._id] = s.count; });
 
@@ -184,17 +180,13 @@ const AdminDashboard = () => {
                     <p className="text-slate-500 mt-1 text-sm">Tổng quan hoạt động của cửa hàng J2 Auto Parts</p>
                 </div>
                 <div className="flex gap-3">
-<<<<<<< Updated upstream
-=======
                     <Button
                         onClick={handleExportRevenue}
                         variant="outline"
                         className="border-green-600/50 bg-transparent text-green-400 hover:bg-green-600/10 rounded-xl h-10"
                     >
                         <FileSpreadsheet size={16} className="mr-2" /> Xuất doanh thu
-                    </Button>
->>>>>>> Stashed changes
-                    <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
+                    </Button>                    <Button onClick={() => navigate('/admin/orders')} variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800 rounded-xl h-10">
                         <ShoppingBag size={16} className="mr-2" /> Đơn hàng
                     </Button>
                     <Button onClick={() => navigate('/admin/products/create')} className="bg-white text-black hover:bg-slate-200 rounded-xl h-10 font-bold shadow-xl shadow-white/5">

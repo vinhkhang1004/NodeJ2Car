@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../services/orderService';
-<<<<<<< Updated upstream
-import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle } from 'lucide-react';
-=======
 import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { exportToExcel } from '../../lib/exportExcel';
->>>>>>> Stashed changes
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,8 +27,6 @@ const OrderList = () => {
         loadOrders();
     }, []);
 
-<<<<<<< Updated upstream
-=======
     const handleExportOrders = () => {
         const dataToExport = orders.map(order => ({
             'ID Đơn hàng': order._id,
@@ -50,8 +44,6 @@ const OrderList = () => {
 
         exportToExcel(dataToExport, `Danh_sach_don_hang_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}`, 'DonHang');
     };
-
->>>>>>> Stashed changes
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Processing':
@@ -76,8 +68,6 @@ const OrderList = () => {
                         Tổng cộng <span className="text-white font-medium">{orders.length}</span> đơn hàng
                     </p>
                 </div>
-<<<<<<< Updated upstream
-=======
                 <div className="flex gap-2">
                     <Button
                         onClick={handleExportOrders}
@@ -87,7 +77,6 @@ const OrderList = () => {
                         <FileSpreadsheet size={16} className="mr-2" /> Xuất Excel Đơn Hàng
                     </Button>
                 </div>
->>>>>>> Stashed changes
             </div>
 
             {error && (
