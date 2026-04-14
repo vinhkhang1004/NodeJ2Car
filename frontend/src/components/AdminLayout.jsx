@@ -39,8 +39,10 @@ const AdminLayout = () => {
                 { name: 'Đơn hàng', icon: ShoppingBag, path: '/admin/orders' },
                 { name: 'Đánh giá', icon: MessageSquare, path: '/admin/reviews' },
                 { name: 'Người dùng', icon: Users, path: '/admin/users' },
+                { name: 'Trò chuyện', icon: MessageSquare, path: '/admin/chat' },
             ]
         },
+
 
     ];
 
