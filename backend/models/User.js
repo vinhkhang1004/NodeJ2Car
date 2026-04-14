@@ -51,9 +51,14 @@ const userSchema = mongoose.Schema(
                 country: { type: String, default: 'Việt Nam' },
                 postalCode: { type: String, default: '' },
                 lat: { type: Number },
-                lng: { type: Number },
                 isDefault: { type: Boolean, default: false },
-            }
+            },
+        ],
+        wishlist: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'AutoPart',
+            },
         ],
         wishlist: [
             {

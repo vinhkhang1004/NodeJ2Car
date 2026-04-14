@@ -16,8 +16,9 @@ export const AuthProvider = ({ children }) => {
             setUser(parsed);
             if (parsed.wishlist) setWishlist(parsed.wishlist);
             
-            // Sync initial data from profile
+            // Sync fresh data from profile
             api.get('/auth/profile')
+
                 .then(({ data }) => {
                     setAddresses(data.addresses || []);
                     setWishlist(data.wishlist || []);
@@ -72,8 +73,9 @@ export const AuthProvider = ({ children }) => {
             return false;
         }
     };
-    
+
     const updateUserInfo = (data) => {
+
         setUser(data);
         localStorage.setItem('userInfo', JSON.stringify(data));
     };
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
             login, 
             register, 
             logout, 
-            toggleWishlist,
+            toggleWishlist, 
             updateUserInfo, 
             updateAddresses, 
             loading 

@@ -243,6 +243,71 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// @desc    Add product to wishlist
+// @route   POST /api/auth/wishlist/:id
+// @access  Private
+const addToWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const productId = req.params.id;
+        
+        // Prevent duplicate IDs using robust comparison
+        const isAlreadyAdded = user.wishlist.some(
+            (id) => id.toString() === productId
+        );
+
+        if (isAlreadyAdded) {
+            return res.status(400).json({ message: 'Product already in wishlist' });
+        }
+
+        user.wishlist.push(productId);
+        await user.save();
+
+        res.json({ wishlist: user.wishlist, message: 'Added to wishlist' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Remove product from wishlist
+// @route   DELETE /api/auth/wishlist/:id
+// @access  Private
+const removeFromWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.wishlist = user.wishlist.filter(
+            (id) => id.toString() !== req.params.id
+        );
+        await user.save();
+
+        res.json({ wishlist: user.wishlist, message: 'Removed from wishlist' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get user wishlist
+// @route   GET /api/auth/wishlist
+// @access  Private
+const getWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate({
+            path: 'wishlist',
+            select: 'name price imageUrl brand category stock rating numReviews description'
+        });
+        
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        res.json(user.wishlist);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 //..
 // @desc    Add product to wishlist
 // @route   POST /api/auth/wishlist/:id

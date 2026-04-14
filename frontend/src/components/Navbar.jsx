@@ -119,10 +119,10 @@ const Navbar = () => {
                     )}
                     
                     {user && (
-                        <Link to="/wishlist" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2 hidden sm:block">
-                            <Heart className={wishlist.length > 0 ? 'text-red-500 fill-red-500' : 'text-[#0f172a]'} size={24} />
+                        <Link to="/wishlist" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2">
+                            <Heart className={`text-[#0f172a] ${wishlist.length > 0 ? 'fill-red-500 text-red-500' : ''}`} size={24} />
                             {wishlist.length > 0 && (
-                                <span className="absolute top-0 right-0 bg-blue-950 text-white text-[9px] font-bold flex items-center justify-center rounded-full w-5 h-5 shadow-sm border border-white">
+                                <span className="absolute top-0 right-0 bg-red-600 text-white text-[9px] font-bold flex items-center justify-center rounded-full w-5 h-5 shadow-sm border border-white">
                                     {wishlist.length}
                                 </span>
                             )}

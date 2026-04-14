@@ -23,16 +23,19 @@ const createVnpayPayment = async (req, res) => {
         });
 
         const paymentUrl = vnpay.buildPaymentUrl({
-            vnp_Amount: order.totalPrice,
+            vnp_Amount: order.totalPrice * 100,
             vnp_IpAddr: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1',
             vnp_TxnRef: order._id.toString(),
-            vnp_OrderInfo: `Thanh toan don hang #${order._id}`,
+            vnp_OrderInfo: `Thanh toan don hang ${order._id.toString()}`,
             vnp_OrderType: 'other',
             vnp_ReturnUrl: `${process.env.FRONTEND_URL}/order-success/${order._id}`,
             vnp_Locale: 'vn',
         });
 
+        console.log('Generated VNPAY URL:', paymentUrl);
+
         res.json({ payUrl: paymentUrl });
+
     } catch (error) {
         console.error('VNPAY Exception:', error);
         res.status(500).json({ message: error.message });
