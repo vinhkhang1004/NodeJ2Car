@@ -31,6 +31,9 @@ import CategoryList from './pages/admin/CategoryList';
 import CategoryEdit from './pages/admin/CategoryEdit';
 import CategoryDetail from './pages/admin/CategoryDetail';
 
+import ChatManagement from './pages/admin/ChatManagement';
+import ChatWidget from './components/ChatWidget';
+
 import Cart from './pages/Cart';
 import UserList from './pages/admin/UserList';
 import OrderList from './pages/admin/OrderList';
@@ -44,6 +47,7 @@ function PublicLayout() {
       <main className="animate-fade-in">
         <Outlet />
       </main>
+      <ChatWidget />
     </>
   );
 }
@@ -85,7 +89,8 @@ function App() {
             {/* Users */}
             <Route path="/admin/users" element={<UserList />} />
 
-            {/* Legacy parts routes removed */}
+            {/* Chat */}
+            <Route path="/admin/chat" element={<ChatManagement />} />
 
             {/* Products: List → Detail → Create → Edit */}
             <Route path="/admin/products" element={<ProductList />} />
@@ -114,3 +119,4 @@ function App() {
 }
 
 export default App;
+
