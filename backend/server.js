@@ -12,7 +12,24 @@ const orderRoutes = require('./routes/orderRoutes.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const path = require('path');
 
+const http = require('http');
+const { Server } = require('socket.io');
+const chatRoutes = require('./routes/chatRoutes.js');
+const Message = require('./models/Message.js');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: [
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'https://j2autoparts.web.app',
+            'https://j2autoparts.firebaseapp.com'
+        ],
+        methods: ["GET", "POST"]
+    }
+});
 
 // Connect to MongoDB
 connectDB();
@@ -37,6 +54,7 @@ app.use('/api/categories', categoryRoutes); // new category CRUD
 app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.use(
     '/uploads',
@@ -45,6 +63,71 @@ app.use(
 
 app.get('/', (req, res) => {
     res.send('J2Car API is running...');
+});
+
+// Socket.io Logic
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('join_room', (roomId) => {
+        socket.join(roomId);
+        console.log(`User joined room: ${roomId}`);
+    });
+
+    socket.on('send_message', async (data) => {
+        const { sender, guestId, senderName, message, isAdmin, roomId } = data;
+        
+        try {
+            // Save to DB
+            const newMessage = await Message.create({
+                sender: sender || null,
+                guestId: guestId || null,
+                senderName,
+                message,
+                isAdmin: isAdmin || false,
+            });
+
+            // Emit to room
+            io.to(roomId).emit('receive_message', newMessage);
+
+            // If not admin, notify all admins of new message
+            if (!isAdmin) {
+                io.emit('admin_notification', {
+                    roomId,
+                    senderName,
+                    message: newMessage
+                });
+            }
+        } catch (error) {
+            console.error('Socket error:', error);
+        }
+    });
+
+    socket.on('mark_seen', async (data) => {
+        const { roomId, isAdmin } = data;
+        try {
+            await Message.updateMany(
+                { 
+                    $or: [{ sender: roomId }, { guestId: roomId }, { receiver: roomId }],
+                    isRead: false,
+                    isAdmin: !isAdmin // If user opening, mark admin messages seen. If admin, mark user's.
+                },
+                { isRead: true, status: 'seen' }
+            );
+            io.to(roomId).emit('messages_seen', { roomId });
+        } catch (error) {
+            console.error('Mark seen error:', error);
+        }
+    });
+
+    socket.on('toggle_support_status', (isOnline) => {
+        io.emit('support_status_change', isOnline);
+    });
+
+    socket.on('disconnect', () => {
+
+        console.log('User disconnected:', socket.id);
+    });
 });
 
 // Generic Error Handler
@@ -57,6 +140,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
+server.listen(PORT, () =>
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`)
 );
+
