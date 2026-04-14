@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import CheckoutSteps from '../components/CheckoutSteps';
-import { createOrder } from '../services/orderService';
+import { createOrder, createMomoPayment, createVnpayPayment } from '../services/orderService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getFileUrl } from '../lib/utils';
@@ -61,8 +61,26 @@ const PlaceOrder = () => {
             };
 
             const { data } = await createOrder(orderData);
+            
+            if (paymentMethod === 'MoMo') {
+                const { data: payData } = await createMomoPayment(data._id);
+                if (payData && payData.payUrl) {
+                    clearCart();
+                    window.location.href = payData.payUrl;
+                    return;
+                }
+            } else if (paymentMethod === 'VNPAY') {
+                const { data: payData } = await createVnpayPayment(data._id);
+                if (payData && payData.payUrl) {
+                    clearCart();
+                    window.location.href = payData.payUrl;
+                    return;
+                }
+            }
+
             clearCart();
             navigate(`/order-success/${data._id}`);
+
         } catch (err) {
             setError(err.response?.data?.message || err.message);
         } finally {

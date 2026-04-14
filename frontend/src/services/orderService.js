@@ -45,3 +45,11 @@ export const exportRevenue = async () => {
   link.click();
   link.remove();
 };
+
+export const createMomoPayment = async (orderId) => {
+    return await api.post(`/payment/momo/${orderId}`);
+};
+
+export const createVnpayPayment = async (orderId) => {
+    return await api.post(`/payment/vnpay/${orderId}`);
+};

@@ -11,6 +11,7 @@ const PartCard = ({ part }) => {
   const { addToCart } = useContext(CartContext);
   const { wishlist, toggleWishlist, user } = useContext(AuthContext);
   
+
   const isFavorite = wishlist.includes(part._id);
 
   // Format price to VND style

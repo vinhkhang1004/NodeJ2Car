@@ -39,4 +39,10 @@ router.route('/wishlist/:id')
 router.route('/users').get(protect, admin, getUsers);
 router.route('/:id').delete(protect, admin, deleteUser);
 
+// Wishlist routes
+router.route('/wishlist').get(protect, getWishlist);
+router.route('/wishlist/:id')
+    .post(protect, addToWishlist)
+    .delete(protect, removeFromWishlist);
+
 module.exports = router;

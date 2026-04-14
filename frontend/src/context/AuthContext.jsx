@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
             
             // Sync fresh data from profile
             api.get('/auth/profile')
+
                 .then(({ data }) => {
                     setAddresses(data.addresses || []);
                     setWishlist(data.wishlist || []);
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const updateUserInfo = (data) => {
+
         setUser(data);
         localStorage.setItem('userInfo', JSON.stringify(data));
     };
