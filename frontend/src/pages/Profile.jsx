@@ -23,13 +23,9 @@ const Profile = () => {
 
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
-    const [phone, setPhone] = useState(user?.phone || '');
-    const [address, setAddress] = useState(user?.address || '');
-    const [city, setCity] = useState(user?.city || '');
-    const [country, setCountry] = useState(user?.country || '');
-    const [postalCode, setPostalCode] = useState(user?.postalCode || '');
     
     const [password, setPassword] = useState('');
+
     const [confirmPassword, setConfirmPassword] = useState('');
     
     const [orders, setOrders] = useState([]);
@@ -98,13 +94,9 @@ const Profile = () => {
             const { data } = await updateProfile({ 
                 name, 
                 email, 
-                phone, 
-                address, 
-                city, 
-                country, 
-                postalCode, 
                 password 
             });
+
             updateUserInfo(data);
             setMessage('Cập nhật thông tin thành công!');
             setPassword('');
@@ -189,80 +181,7 @@ const Profile = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 pt-4 border-t border-slate-800 mt-6">
-                                    <h3 className="text-sm font-medium text-slate-300 mb-2 uppercase tracking-wider">Thông tin giao hàng</h3>
-                                    
-                                    <div className="space-y-2">
-                                        <Label htmlFor="phone" className="text-slate-400 text-xs">Số điện thoại</Label>
-                                        <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                                            <Input 
-                                                id="phone"
-                                                value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                placeholder="VD: 0987654321"
-                                                className="pl-10 bg-slate-900/50 border-slate-800 focus:border-primary transition-all"
-                                            />
-                                        </div>
-                                    </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="address" className="text-slate-400 text-xs">Địa chỉ chi tiết</Label>
-                                        <div className="relative">
-                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                                            <Input 
-                                                id="address"
-                                                value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                placeholder="Số nhà, tên đường..."
-                                                className="pl-10 bg-slate-900/50 border-slate-800 focus:border-primary transition-all"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="city" className="text-slate-400 text-xs">Thành phố</Label>
-                                            <div className="relative">
-                                                <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                                                <Input 
-                                                    id="city"
-                                                    value={city}
-                                                    onChange={(e) => setCity(e.target.value)}
-                                                    placeholder="VD: Hà Nội"
-                                                    className="pl-10 bg-slate-900/50 border-slate-800 focus:border-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="postal" className="text-slate-400 text-xs">Mã bưu chính</Label>
-                                            <div className="relative">
-                                                <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                                                <Input 
-                                                    id="postal"
-                                                    value={postalCode}
-                                                    onChange={(e) => setPostalCode(e.target.value)}
-                                                    placeholder="10000"
-                                                    className="pl-10 bg-slate-900/50 border-slate-800 focus:border-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="country" className="text-slate-400 text-xs">Quốc gia</Label>
-                                        <div className="relative">
-                                            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                                            <Input 
-                                                id="country"
-                                                value={country}
-                                                onChange={(e) => setCountry(e.target.value)}
-                                                placeholder="VD: Việt Nam"
-                                                className="pl-10 bg-slate-900/50 border-slate-800 focus:border-primary transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <div className="pt-4 border-t border-slate-800 mt-6">
                                     <h3 className="text-sm font-medium text-slate-300 mb-4 uppercase tracking-wider">Đổi mật khẩu</h3>

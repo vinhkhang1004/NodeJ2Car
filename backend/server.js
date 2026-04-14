@@ -10,16 +10,21 @@ const categoryRoutes = require('./routes/categoryRoutes.js');
 const uploadRoutes = require('./routes/uploadRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
+const notificationRoutes = require('./routes/notificationRoutes.js');
 const path = require('path');
+
 
 const http = require('http');
 const { Server } = require('socket.io');
 const chatRoutes = require('./routes/chatRoutes.js');
 const Message = require('./models/Message.js');
+const Notification = require('./models/Notification.js');
+
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
+
     cors: {
         origin: [
             'http://localhost:5173',
@@ -27,9 +32,11 @@ const io = new Server(server, {
             'https://j2autoparts.web.app',
             'https://j2autoparts.firebaseapp.com'
         ],
-        methods: ["GET", "POST"]
     }
 });
+
+app.set('io', io);
+
 
 // Connect to MongoDB
 connectDB();
@@ -55,6 +62,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/notifications', notificationRoutes);
+
 
 app.use(
     '/uploads',
@@ -92,12 +101,25 @@ io.on('connection', (socket) => {
 
             // If not admin, notify all admins of new message
             if (!isAdmin) {
+                // Save to central notification system
+                try {
+                    await Notification.create({
+                        type: 'chat',
+                        message: `Tin nhắn mới từ ${senderName}`,
+                        link: '/admin/chat',
+                        referenceId: roomId
+                    });
+                } catch (err) {
+                    console.error('Chat notification save error:', err);
+                }
+
                 io.emit('admin_notification', {
                     roomId,
                     senderName,
                     message: newMessage
                 });
             }
+
         } catch (error) {
             console.error('Socket error:', error);
         }
