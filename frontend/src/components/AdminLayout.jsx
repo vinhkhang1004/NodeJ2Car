@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import NotificationBell from './admin/NotificationBell';
+
 
 const AdminLayout = () => {
     const { user, logout } = useContext(AuthContext);
@@ -130,14 +132,21 @@ const AdminLayout = () => {
                 {/* Top bar */}
                 <div className="h-14 border-b border-slate-800/50 bg-[#09090b]/80 backdrop-blur-sm flex items-center px-8 sticky top-0 z-10 flex-shrink-0">
                     <div className="flex-1" />
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-6">
+                        <NotificationBell />
+                        
+                        <div className="flex items-center gap-3 border-l border-slate-800 pl-6">
+
                         <span className="text-slate-500 text-xs">Xin chào,</span>
                         <span className="text-white text-sm font-bold">{user?.name || 'Admin'}</span>
                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     </div>
                 </div>
+            </div>
+
 
                 {/* Page content */}
+
                 <div className="p-8 flex-1 overflow-auto">
                     <div className="max-w-[1400px] mx-auto w-full">
                         <Outlet />
