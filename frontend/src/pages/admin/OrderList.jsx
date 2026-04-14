@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../../services/orderService';
-import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { Loader2, Eye, ShoppingBag, Clock, CheckCircle, Truck, XCircle, AlertCircle, FileSpreadsheet, Tag } from 'lucide-react';
+
 import { exportToExcel } from '../../lib/exportExcel';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -119,9 +120,16 @@ const OrderList = () => {
                                         <td className="px-6 py-4 text-slate-300">
                                             {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                                         </td>
-                                        <td className="px-6 py-4 font-bold text-success">
-                                            {order.totalPrice.toLocaleString('vi-VN')}₫
+                                        <td className="px-6 py-4">
+                                            <div className="font-bold text-success">{order.totalPrice.toLocaleString('vi-VN')}₫</div>
+                                            {order.coupon && (
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <Tag size={10} className="text-secondary" />
+                                                    <span className="text-[9px] font-black text-secondary uppercase tracking-tight">{order.coupon.code}</span>
+                                                </div>
+                                            )}
                                         </td>
+
                                         <td className="px-6 py-4">
                                             {getStatusBadge(order.status)}
                                         </td>

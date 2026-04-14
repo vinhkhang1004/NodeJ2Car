@@ -4,14 +4,19 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { createOrder, createMomoPayment, createVnpayPayment } from '../services/orderService';
+import api from '../services/api';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getFileUrl } from '../lib/utils';
 import { 
-    MapPin, CreditCard, ShoppingBag, 
+    MapPin, CreditCard, ShoppingBag, Tag, Ticket,
     ChevronRight, Loader2, AlertCircle, CheckCircle 
 } from 'lucide-react';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+
 
 const PlaceOrder = () => {
     const navigate = useNavigate();
@@ -24,11 +29,28 @@ const PlaceOrder = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const [couponCode, setCouponCode] = useState('');
+    const [couponLoading, setCouponLoading] = useState(false);
+    const [couponData, setCouponData] = useState(null);
+    const [couponError, setCouponError] = useState(null);
+    const [couponSuccess, setCouponSuccess] = useState(null);
+
     // Calc prices
     const itemsPrice = cartTotal;
-    const shippingPrice = itemsPrice > 1000000 ? 0 : 30000; // Free over 1M
-    const taxPrice = 0; // VAT included in prices usually
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+    const shippingPrice = itemsPrice > 1000000 ? 0 : 30000;
+    
+    let discountPrice = 0;
+    if (couponData) {
+        if (couponData.discountType === 'Percentage') {
+            discountPrice = (itemsPrice * couponData.discountAmount) / 100;
+        } else {
+            discountPrice = couponData.discountAmount;
+        }
+    }
+
+    const taxPrice = 0;
+    const totalPrice = itemsPrice + shippingPrice + taxPrice - discountPrice;
+
 
     useEffect(() => {
         if (!paymentMethod) {
@@ -39,7 +61,34 @@ const PlaceOrder = () => {
         }
     }, [paymentMethod, cartItems, navigate]);
 
+    const applyCouponHandler = async () => {
+        if (!couponCode) return;
+        setCouponLoading(true);
+        setCouponError(null);
+        setCouponSuccess(null);
+        try {
+            const { data } = await api.post('/coupons/validate', {
+
+                code: couponCode,
+                cartItems: cartItems.map(item => ({...item, categoryId: item.category?._id || item.category})),
+                itemsTotal: itemsPrice
+            });
+            setCouponData(data);
+            setCouponSuccess(`Đã áp dụng mã ${data.code} thành công!`);
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || err.message || 'Mã không hợp lệ';
+            const status = err.response?.status ? ` [${err.response.status}]` : '';
+            setCouponError(`${errorMsg}${status}`);
+            setCouponData(null);
+            console.error('Coupon Apply Error:', err);
+        } finally {
+
+            setCouponLoading(false);
+        }
+    };
+
     const placeOrderHandler = async () => {
+
         try {
             setLoading(true);
             setError(null);
@@ -57,8 +106,11 @@ const PlaceOrder = () => {
                 itemsPrice,
                 shippingPrice,
                 taxPrice,
+                discountPrice,
+                couponId: couponData?._id,
                 totalPrice,
             };
+
 
             const { data } = await createOrder(orderData);
             
@@ -196,6 +248,13 @@ const PlaceOrder = () => {
                                     <span>Thuế (VAT)</span>
                                     <span className="font-mono text-slate-200">0₫</span>
                                 </div>
+
+                                {couponData && (
+                                    <div className="flex justify-between text-emerald-400 font-bold bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10 animate-in fade-in slide-in-from-right-2">
+                                        <span className="flex items-center gap-1"><Ticket size={14} /> Giảm giá ({couponData.code})</span>
+                                        <span className="font-mono">-{discountPrice.toLocaleString('vi-VN')}₫</span>
+                                    </div>
+                                )}
                                 
                                 <div className="pt-6 border-t border-slate-800 flex justify-between items-end">
                                     <span className="font-bold text-xl uppercase tracking-tighter">Tổng tiền</span>
@@ -206,6 +265,34 @@ const PlaceOrder = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Coupon Input */}
+                            <div className="mb-8 p-6 bg-slate-900/50 rounded-2xl border border-slate-800 transition-all focus-within:border-primary/50 group">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 block">Mã giảm giá</Label>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-grow">
+                                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={16} />
+                                        <input 
+                                            type="text"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                            placeholder="NHẬP MÃ TẠI ĐÂY..."
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl h-12 pl-10 pr-4 text-sm font-black tracking-widest text-white uppercase focus:outline-none focus:border-primary transition-all placeholder:text-slate-700"
+                                        />
+                                    </div>
+                                    <Button 
+                                        type="button" 
+                                        onClick={applyCouponHandler}
+                                        disabled={couponLoading || !couponCode}
+                                        className="bg-primary hover:bg-primary/90 text-white h-12 px-6 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all text-xs shrink-0"
+                                    >
+                                        {couponLoading ? <Loader2 size={16} className="animate-spin" /> : 'ÁP DỤNG'}
+                                    </Button>
+                                </div>
+                                {couponError && <p className="text-[10px] font-bold text-red-400 mt-2 flex items-center gap-1 uppercase tracking-tight"><AlertCircle size={10} /> {couponError}</p>}
+                                {couponSuccess && <p className="text-[10px] font-bold text-emerald-400 mt-2 flex items-center gap-1 uppercase tracking-tight"><CheckCircle size={10} /> {couponSuccess}</p>}
+                            </div>
+
 
                             <Button 
                                 onClick={placeOrderHandler}

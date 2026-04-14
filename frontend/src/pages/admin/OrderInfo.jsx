@@ -163,10 +163,26 @@ const OrderInfo = () => {
                                 <span>Phí vận chuyển</span>
                                 <span className="text-white font-mono">{order.shippingPrice.toLocaleString('vi-VN')}₫</span>
                             </div>
+                            
+                            {order.discountPrice > 0 && (
+                                <div className="flex justify-between text-success/80">
+                                    <div className="flex items-center gap-2">
+                                        <span>Giảm giá</span>
+                                        {order.coupon && (
+                                            <Badge variant="outline" className="text-[10px] py-0 border-success/30 text-success">
+                                                {order.coupon.code}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <span className="font-mono">-{order.discountPrice.toLocaleString('vi-VN')}₫</span>
+                                </div>
+                            )}
+
                             <div className="pt-3 border-t border-slate-800 flex justify-between items-center">
                                 <span className="font-bold text-lg text-white">Tổng cộng</span>
                                 <span className="text-2xl font-bold text-primary font-mono">{order.totalPrice.toLocaleString('vi-VN')}₫</span>
                             </div>
+
                         </CardContent>
                     </Card>
                 </div>

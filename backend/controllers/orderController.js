@@ -1,7 +1,9 @@
 const Order = require('../models/Order.js');
 const AutoPart = require('../models/AutoPart.js');
 const Notification = require('../models/Notification.js');
+const Coupon = require('../models/Coupon.js');
 const sendEmail = require('../utils/sendEmail.js');
+
 
 const { generateExcel } = require('../utils/excel.js');
 
@@ -17,8 +19,11 @@ const addOrderItems = async (req, res) => {
         itemsPrice,
         taxPrice,
         shippingPrice,
+        discountPrice,
+        couponId,
         totalPrice,
     } = req.body;
+
 
     if (orderItems && orderItems.length === 0) {
         res.status(400);
@@ -40,8 +45,11 @@ const addOrderItems = async (req, res) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
+            discountPrice: discountPrice || 0,
+            coupon: couponId || null,
             totalPrice,
         });
+
 
         const createdOrder = await order.save();
 
@@ -54,21 +62,29 @@ const addOrderItems = async (req, res) => {
                 referenceId: createdOrder._id
             });
             const io = req.app.get('io');
-            if (io) io.emit('admin_new_notification', notification);
+            if (io) {
+                io.emit('admin_new_notification', notification);
+                console.log('Socket.io: Emitted admin_new_notification for order:', createdOrder._id);
+            } else {
+                console.warn('Socket.io: io instance not found in req.app');
+            }
         } catch (err) {
+
             console.error('Notification error:', err);
         }
 
         // Update stock
 
-        for (const item of orderItems) {
-            await AutoPart.updateOne(
-                { _id: item.product || item._id },
-                { $inc: { stock: -item.qty } }
-            );
+        // Update coupon usage
+        if (couponId) {
+            await Coupon.findByIdAndUpdate(couponId, {
+                $inc: { usedCount: 1 },
+                $push: { usedBy: req.user._id }
+            });
         }
 
         res.status(201).json(createdOrder);
+
     }
 };
 
@@ -78,7 +94,9 @@ const addOrderItems = async (req, res) => {
 const getOrderById = async (req, res) => {
     const order = await Order.findById(req.params.id)
         .populate('user', 'name email')
-        .populate('orderItems.product', 'name sku price imageUrl');
+        .populate('orderItems.product', 'name sku price imageUrl')
+        .populate('coupon', 'code discountAmount discountType');
+
 
     if (order) {
         // Only allow user who placed the order or admin to view it
@@ -151,7 +169,9 @@ const getMyOrders = async (req, res) => {
 const getOrders = async (req, res) => {
     const orders = await Order.find({})
         .populate('user', 'id name')
+        .populate('coupon', 'code')
         .sort({ createdAt: -1 });
+
     res.json(orders);
 };
 

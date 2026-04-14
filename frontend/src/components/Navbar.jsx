@@ -2,7 +2,8 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X, Heart } from 'lucide-react';
+import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X, Heart, Zap, ChevronRight } from 'lucide-react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,10 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center gap-10 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     <Link to="/" className="hover:text-blue-700 transition-colors pb-1 border-b-2 border-transparent">Trang chủ</Link>
                     <Link to="/shop" className="hover:text-blue-700 transition-colors pb-1 border-b-2 border-transparent">Sản phẩm</Link>
+                    <Link to="/offers" className="hover:text-orange-500 transition-colors pb-1 border-b-2 border-transparent flex items-center gap-1">
+                        <Zap size={10} className="fill-orange-500 text-orange-500" /> Ưu đãi
+                    </Link>
+
                     
                     {/* Category Dropdown */}
                     <DropdownMenu>
