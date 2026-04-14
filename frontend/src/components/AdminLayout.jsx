@@ -13,6 +13,8 @@ import {
     MessageSquare,
 } from 'lucide-react';
 
+
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NotificationBell from './admin/NotificationBell';
 
@@ -39,7 +41,9 @@ const AdminLayout = () => {
                 { name: 'Sản phẩm', icon: Package, path: '/admin/products' },
                 { name: 'Danh mục', icon: Tag, path: '/admin/categories' },
                 { name: 'Đơn hàng', icon: ShoppingBag, path: '/admin/orders' },
+                { name: 'Khuyến mãi', icon: Tag, path: '/admin/coupons' },
                 { name: 'Đánh giá', icon: MessageSquare, path: '/admin/reviews' },
+
                 { name: 'Người dùng', icon: Users, path: '/admin/users' },
                 { name: 'Trò chuyện', icon: MessageSquare, path: '/admin/chat' },
             ]

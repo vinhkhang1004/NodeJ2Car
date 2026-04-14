@@ -11,7 +11,9 @@ const uploadRoutes = require('./routes/uploadRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
+const couponRoutes = require('./routes/couponRoutes.js');
 const path = require('path');
+
 
 
 const http = require('http');
@@ -53,7 +55,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Log all requests for debugging
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // Mount Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/parts', partRoutes);          // legacy route (unchanged)
 app.use('/api/products', productRoutes);    // new product CRUD with pagination & category ref
@@ -63,6 +72,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/coupons', couponRoutes);
+
 
 
 app.use(

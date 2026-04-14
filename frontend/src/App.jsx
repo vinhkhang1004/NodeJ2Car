@@ -39,6 +39,10 @@ import UserList from './pages/admin/UserList';
 import OrderList from './pages/admin/OrderList';
 import OrderInfo from './pages/admin/OrderInfo';
 import ReviewList from './pages/admin/ReviewList';
+import CouponManagement from './pages/admin/CouponManagement';
+import Offers from './pages/Offers';
+
+
 
 function PublicLayout() {
   return (
@@ -61,7 +65,9 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/offers" element={<Offers />} />
           <Route path="/search/:keyword" element={<Shop />} />
+
           <Route path="/part/:id" element={<PartDetail />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
@@ -110,6 +116,10 @@ function App() {
 
             {/* Reviews */}
             <Route path="/admin/reviews" element={<ReviewList />} />
+
+            {/* Coupons */}
+            <Route path="/admin/coupons" element={<CouponManagement />} />
+
           </Route>
         </Route>
       </Routes>
