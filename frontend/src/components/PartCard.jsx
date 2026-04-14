@@ -1,13 +1,17 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, ArrowUpRight } from 'lucide-react';
+import { ShoppingCart, ArrowUpRight, Heart } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 import { getFileUrl } from '../lib/utils';
 import Rating from './Rating';
 
 
 const PartCard = ({ part }) => {
   const { addToCart } = useContext(CartContext);
+  const { wishlist, toggleWishlist, user } = useContext(AuthContext);
+  
+  const isFavorite = wishlist.includes(part._id);
   // Format price to VND style
   const formattedPrice = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -22,6 +26,19 @@ const PartCard = ({ part }) => {
           {typeof part.category === 'object' ? part.category?.name : part.category || 'Linh kiện'}
         </span>
       </div>
+
+      {/* Wishlist Button */}
+      {user && (
+        <button 
+          onClick={(e) => { e.preventDefault(); toggleWishlist(part._id); }} 
+          className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 backdrop-blur-md shadow-lg rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group/heart"
+        >
+          <Heart 
+            size={18} 
+            className={`transition-colors duration-300 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-slate-400 group-hover/heart:text-red-400'}`} 
+          />
+        </button>
+      )}
 
       {/* Image Container */}
       <div className="relative h-64 overflow-hidden bg-slate-50">

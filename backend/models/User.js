@@ -55,6 +55,12 @@ const userSchema = mongoose.Schema(
                 isDefault: { type: Boolean, default: false },
             }
         ],
+        wishlist: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'AutoPart',
+            }
+        ],
     },
     {
         timestamps: true,

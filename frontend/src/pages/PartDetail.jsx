@@ -15,7 +15,8 @@ import {
     ArrowLeft,
     Check,
     Pencil,
-    Trash2
+    Trash2,
+    Heart
 } from 'lucide-react';
 
 const PartDetail = () => {
@@ -26,7 +27,9 @@ const PartDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
-    const { user } = useContext(AuthContext);
+    const { user, wishlist, toggleWishlist } = useContext(AuthContext);
+
+    const isFavorite = wishlist.includes(id);
 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -231,6 +234,19 @@ const PartDetail = () => {
                                 <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200 w-full flex items-center justify-center gap-2">
                                     <ShoppingCart size={16} /> Thêm Giỏ Hàng
                                 </button>
+                                {user && (
+                                    <button 
+                                        onClick={() => toggleWishlist(id)}
+                                        className={`py-5 flex items-center justify-center gap-2 font-black uppercase tracking-[0.2em] text-xs transition-all border w-full ${
+                                            isFavorite 
+                                            ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' 
+                                            : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-blue-950'
+                                        }`}
+                                    >
+                                        <Heart size={16} className={isFavorite ? 'fill-red-600' : ''} />
+                                        {isFavorite ? 'Đã yêu thích' : 'Yêu thích'}
+                                    </button>
+                                )}
                             </div>
                             <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
                                 Giao hàng miễn phí toàn quốc trong 24h

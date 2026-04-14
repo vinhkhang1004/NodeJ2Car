@@ -17,6 +17,7 @@ import Shipping from './pages/Shipping';
 import Payment from './pages/Payment';
 import PlaceOrder from './pages/PlaceOrder';
 import OrderResult from './pages/OrderResult';
+import Wishlist from './pages/Wishlist';
 
 // Legacy parts removed
 
@@ -62,6 +63,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/shipping" element={<Shipping />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/placeorder" element={<PlaceOrder />} />

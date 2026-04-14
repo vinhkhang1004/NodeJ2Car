@@ -56,19 +56,40 @@ const Payment = () => {
                                     </div>
                                 </div>
 
-                                {/* Online Payment (Placeholder) */}
+                                 {/* MoMo Option */}
                                 <div 
-                                    className="p-6 rounded-2xl border-2 border-slate-800 bg-slate-900/10 opacity-40 cursor-not-allowed flex items-center gap-6 relative overflow-hidden"
+                                    onClick={() => setMethod('MoMo')}
+                                    className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-6 ${method === 'MoMo' ? 'border-[#a50064] bg-[#a50064]/5 ring-4 ring-[#a50064]/10' : 'border-slate-800 bg-slate-900/30 hover:bg-slate-900/50 grayscale'}`}
                                 >
-                                    <div className="w-12 h-12 rounded-xl bg-slate-800 text-slate-500 flex items-center justify-center">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method === 'MoMo' ? 'bg-[#a50064] text-white' : 'bg-slate-800 text-slate-500'}`}>
                                         <Wallet size={24} />
                                     </div>
                                     <div className="flex-grow">
-                                        <h3 className="font-bold text-lg">Chuyển khoản / Ví điện tử</h3>
-                                        <p className="text-slate-500 text-sm">Đang bảo trì...</p>
+                                        <h3 className="font-bold text-lg">Ví điện tử MoMo</h3>
+                                        <p className="text-slate-500 text-sm">Thanh toán nhanh qua ứng dụng MoMo.</p>
                                     </div>
-                                    <div className="w-6 h-6 rounded-full border-2 border-slate-700"></div>
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${method === 'MoMo' ? 'border-[#a50064]' : 'border-slate-700'}`}>
+                                        {method === 'MoMo' && <div className="w-3 h-3 rounded-full bg-[#a50064]" />}
+                                    </div>
                                 </div>
+
+                                {/* VNPAY Option */}
+                                <div 
+                                    onClick={() => setMethod('VNPAY')}
+                                    className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-6 ${method === 'VNPAY' ? 'border-[#e01020] bg-[#e01020]/5 ring-4 ring-[#e01020]/10' : 'border-slate-800 bg-slate-900/30 hover:bg-slate-900/50 grayscale'}`}
+                                >
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method === 'VNPAY' ? 'bg-[#e01020] text-white' : 'bg-slate-800 text-slate-500'}`}>
+                                        <CreditCard size={24} />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h3 className="font-bold text-lg">Cổng thanh toán VNPAY</h3>
+                                        <p className="text-slate-500 text-sm">Thanh toán qua Thẻ ATM, Visa, Master, QR Code.</p>
+                                    </div>
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${method === 'VNPAY' ? 'border-[#e01020]' : 'border-slate-700'}`}>
+                                        {method === 'VNPAY' && <div className="w-3 h-3 rounded-full bg-[#e01020]" />}
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div className="flex gap-4 pt-8">
