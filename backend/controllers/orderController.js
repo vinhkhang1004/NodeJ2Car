@@ -1,6 +1,8 @@
 const Order = require('../models/Order.js');
 const AutoPart = require('../models/AutoPart.js');
+const Notification = require('../models/Notification.js');
 const sendEmail = require('../utils/sendEmail.js');
+
 const { generateExcel } = require('../utils/excel.js');
 
 // @desc    Create new order
@@ -43,7 +45,22 @@ const addOrderItems = async (req, res) => {
 
         const createdOrder = await order.save();
 
+        // Create Admin Notification
+        try {
+            const notification = await Notification.create({
+                type: 'order',
+                message: `Đơn hàng mới #${createdOrder._id} từ ${req.user.name}`,
+                link: `/admin/orders`,
+                referenceId: createdOrder._id
+            });
+            const io = req.app.get('io');
+            if (io) io.emit('admin_new_notification', notification);
+        } catch (err) {
+            console.error('Notification error:', err);
+        }
+
         // Update stock
+
         for (const item of orderItems) {
             await AutoPart.updateOne(
                 { _id: item.product || item._id },

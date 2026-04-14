@@ -1,4 +1,6 @@
 const AutoPart = require('../models/AutoPart.js');
+const Notification = require('../models/Notification.js');
+
 
 // @desc    Fetch all auto parts with optional search, filter, pagination
 // @route   GET /api/products
@@ -232,7 +234,23 @@ const createProductReview = async (req, res) => {
                 product.reviews.length;
 
             await product.save();
+
+            // Create Admin Notification
+            try {
+                const notification = await Notification.create({
+                    type: 'review',
+                    message: `Đánh giá mới cho ${product.name} từ ${req.user.name}`,
+                    link: `/admin/reviews`,
+                    referenceId: product._id
+                });
+                const io = req.app.get('io');
+                if (io) io.emit('admin_new_notification', notification);
+            } catch (err) {
+                console.error('Notification error:', err);
+            }
+
             res.status(201).json({ message: 'Review added' });
+
         } else {
             res.status(404).json({ message: 'Product not found' });
         }
