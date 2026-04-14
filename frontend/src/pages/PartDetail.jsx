@@ -237,7 +237,7 @@ const PartDetail = () => {
                                     </button>
                                     {user && (
                                         <button 
-                                            onClick={() => toggleWishlist(part._id)}
+                                            onClick={() => toggleWishlist(part._id || id)}
                                             className="w-16 bg-slate-50 border border-slate-200 flex items-center justify-center transition-all hover:bg-white group"
                                             title={isFavorite ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
                                         >
@@ -245,6 +245,7 @@ const PartDetail = () => {
                                         </button>
                                     )}
                                 </div>
+
                             </div>
                             <p className="mt-6 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
                                 Giao hàng miễn phí toàn quốc trong 24h

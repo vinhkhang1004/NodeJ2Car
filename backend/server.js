@@ -9,6 +9,7 @@ const productRoutes = require('./routes/productRoutes.js'); // new full-featured
 const categoryRoutes = require('./routes/categoryRoutes.js');
 const uploadRoutes = require('./routes/uploadRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
+const paymentRoutes = require('./routes/paymentRoutes.js');
 const path = require('path');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/products', productRoutes);    // new product CRUD with pagination 
 app.use('/api/categories', categoryRoutes); // new category CRUD
 app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.use(
     '/uploads',

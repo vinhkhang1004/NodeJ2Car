@@ -128,7 +128,7 @@ const Navbar = () => {
                             )}
                         </Link>
                     )}
-                    
+
                     <Link to="/cart" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2">
                         <ShoppingCart className="text-[#0f172a]" size={24} />
                         {cartCount > 0 && (
