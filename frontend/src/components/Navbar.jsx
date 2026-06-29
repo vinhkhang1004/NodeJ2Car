@@ -2,7 +2,8 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X, Heart, Zap, ChevronRight } from 'lucide-react';
+import { User, ShoppingCart, LogOut, LayoutDashboard, Search, Menu, X, Heart, Zap, ChevronRight, BarChart2 } from 'lucide-react';
+import { CompareContext } from '../context/CompareContext';
 
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import {
 const Navbar = () => {
     const { user, logout, wishlist } = useContext(AuthContext);
     const { cartCount } = useContext(CartContext);
+    const { compareItems } = useContext(CompareContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
@@ -124,6 +126,15 @@ const Navbar = () => {
                         </button>
                     )}
                     
+                    <Link to="/compare" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2" title="So sánh phụ tùng">
+                        <BarChart2 className={`text-[#0f172a] ${compareItems.length > 0 ? 'text-orange-500' : ''}`} size={24} />
+                        {compareItems.length > 0 && (
+                            <span className="absolute top-0 right-0 bg-orange-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full w-5 h-5 shadow-sm border border-white">
+                                {compareItems.length}
+                            </span>
+                        )}
+                    </Link>
+
                     {user && (
                         <Link to="/wishlist" className="relative cursor-pointer hover:opacity-80 transition-opacity p-2">
                             <Heart className={`text-[#0f172a] ${wishlist.length > 0 ? 'fill-red-500 text-red-500' : ''}`} size={24} />
@@ -169,6 +180,7 @@ const Navbar = () => {
                     <div className="flex flex-col gap-4 text-sm font-bold text-slate-500 uppercase tracking-widest">
                         <Link to="/" onClick={() => setIsMenuOpen(false)} className="hover:text-blue-700">Trang chủ</Link>
                         <Link to="/shop" onClick={() => setIsMenuOpen(false)} className="hover:text-blue-700">Sản phẩm</Link>
+                        <Link to="/compare" onClick={() => setIsMenuOpen(false)} className="hover:text-blue-700">So sánh ({compareItems.length})</Link>
                         <Link to="/schematic" onClick={() => setIsMenuOpen(false)} className="hover:text-blue-700">Sơ đồ xe</Link>
                         <div className="pt-4 mt-4 border-t border-slate-50">
                             <p className="text-[10px] text-slate-400 mb-2">Danh mục</p>

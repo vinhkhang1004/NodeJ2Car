@@ -12,6 +12,7 @@ const {
     deleteProductReview,
     decodeVinEndpoint,
     getCompatibilities,
+    getRelatedProducts,
 } = require('../controllers/productController.js');
 const { protect, admin } = require('../middleware/authMiddleware.js');
 
@@ -24,6 +25,9 @@ router.route('/compatibilities').get(getCompatibilities);
 
 // VIN Decoding lookup
 router.route('/decode-vin/:vin').get(decodeVinEndpoint);
+
+// Related products
+router.route('/:id/related').get(getRelatedProducts);
 
 // Public routes
 router.route('/').get(getProducts).post(protect, admin, createProduct);

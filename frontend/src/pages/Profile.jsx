@@ -369,10 +369,9 @@ const Profile = () => {
                                                             <span className="text-slate-400 text-xs font-bold border border-slate-700 px-2 py-1 rounded">Chưa thanh toán</span>
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        {/* Optional: Add Link to order details page if it exists */}
-                                                        <span className="text-slate-600 text-xs italic">Chi tiết được gửi qua email</span>
-                                                    </td>
+                                                     <td className="px-6 py-4 text-right">
+                                                         <Link to={`/order/${order._id}`} className="text-primary hover:underline text-xs font-bold">Xem chi tiết & Theo dõi</Link>
+                                                     </td>
                                                 </tr>
                                             ))}
                                         </tbody>
