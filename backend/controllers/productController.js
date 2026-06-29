@@ -510,6 +510,52 @@ const deleteProductReview = async (req, res) => {
     }
 };
 
+// @desc    Get related products / replacement parts
+// @route   GET /api/products/:id/related
+// @access  Public
+const getRelatedProducts = async (req, res) => {
+    try {
+        const product = await AutoPart.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+        }
+
+        const currentBrand = product.brand;
+        const currentCategory = product.category;
+        const compatBrands = (product.carCompatibilities || []).map(c => c.carBrand).filter(Boolean);
+
+        const filter = {
+            _id: { $ne: product._id }, // Exclude self
+            isActive: true
+        };
+
+        const conditions = [];
+        if (currentCategory) {
+            conditions.push({ category: currentCategory });
+        }
+        if (currentBrand) {
+            conditions.push({ brand: { $regex: new RegExp(`^${currentBrand}$`, 'i') } });
+        }
+        if (compatBrands.length > 0) {
+            conditions.push({
+                'carCompatibilities.carBrand': { $in: compatBrands }
+            });
+        }
+
+        if (conditions.length > 0) {
+            filter.$or = conditions;
+        }
+
+        const related = await AutoPart.find(filter)
+            .populate('category', 'name slug')
+            .limit(6);
+
+        res.json(related);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getProducts,
     getProductById,
@@ -522,4 +568,5 @@ module.exports = {
     deleteProductReview,
     decodeVinEndpoint,
     getCompatibilities,
+    getRelatedProducts,
 };

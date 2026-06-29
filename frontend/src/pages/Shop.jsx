@@ -10,7 +10,9 @@ import {
     Search, 
     ChevronLeft,
     X,
-    FolderTree
+    FolderTree,
+    Camera,
+    UploadCloud
 } from 'lucide-react';
 
 const Shop = () => {
@@ -19,6 +21,13 @@ const Shop = () => {
     const [parts, setParts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
+    
+    // AI Image Scan states
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+    const [aiFile, setAiFile] = useState(null);
+    const [aiPreview, setAiPreview] = useState('');
+    const [aiScanning, setAiScanning] = useState(false);
+    const [aiScanLabel, setAiScanLabel] = useState('');
     const [loading, setLoading] = useState(true);
     const [metadata, setMetadata] = useState({ page: 1, pages: 1, total: 0 });
     const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -180,6 +189,7 @@ const Shop = () => {
 
     useEffect(() => {
         const fetchParts = async () => {
+            if (aiScanLabel) return;
             try {
                 setLoading(true);
                 const params = new URLSearchParams();
@@ -210,7 +220,7 @@ const Shop = () => {
         };
 
         fetchParts();
-    }, [filters, keyword]);
+    }, [filters, keyword, aiScanLabel]);
 
     const handleFilterChange = (key, value) => {
         const updatedFilters = { 
@@ -240,6 +250,45 @@ const Shop = () => {
         return cat ? cat.name : (idOrName || 'Tất cả sản phẩm');
     };
 
+    const handleAiImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setAiFile(file);
+            setAiPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleAiScan = async () => {
+        if (!aiFile) return;
+        setAiScanning(true);
+        setTimeout(async () => {
+            try {
+                const formData = new FormData();
+                formData.append('image', aiFile);
+
+                const { data } = await api.post('/upload/scan-image', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+
+                setAiScanLabel(data.detectedLabel);
+                setParts(data.products || []);
+                setMetadata({ page: 1, pages: 1, total: data.products?.length || 0 });
+                setIsAiModalOpen(false);
+                setAiFile(null);
+                setAiPreview('');
+            } catch (err) {
+                console.error(err);
+                alert(err.response?.data?.message || 'Lỗi nhận diện hình ảnh');
+            } finally {
+                setAiScanning(false);
+            }
+        }, 2000);
+    };
+
+    const clearAiScan = () => {
+        setAiScanLabel('');
+    };
+
     return (
         <div className="bg-white min-h-screen">
             {/* Header / Breadcrumbs */}
@@ -260,6 +309,12 @@ const Shop = () => {
                             </p>
                         </div>
                         <div className="flex items-center gap-4">
+                            <button 
+                                onClick={() => setIsAiModalOpen(true)}
+                                className="bg-[#f97316] hover:bg-[#ea580c] text-white px-4 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors shadow-lg shadow-orange-500/10 h-10 no-print"
+                            >
+                                <Camera size={12} /> Quét ảnh AI
+                            </button>
                             <div className="flex items-center bg-white border border-slate-200 rounded-sm p-1">
                                 <button className="p-2 bg-blue-950 text-white rounded-sm"><LayoutGrid size={16} /></button>
                                 <button className="p-2 text-slate-400 hover:text-blue-950 transition-colors"><List size={16} /></button>
@@ -279,6 +334,20 @@ const Shop = () => {
                     {/* Sidebar Filters - Desktop */}
                     <aside className="hidden lg:block w-64 shrink-0">
                         <div className="sticky top-24 space-y-12">
+                            {/* AI Search Card */}
+                            <div className="bg-[#18181b] border border-slate-800 p-5 rounded-2xl relative overflow-hidden group shadow-lg shadow-black/20 no-print">
+                                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                    <Camera size={14} className="text-[#f97316]" /> Tìm bằng AI
+                                </h3>
+                                <p className="text-slate-500 text-[10px] leading-relaxed mb-4 font-medium">Chụp hoặc tải ảnh phụ tùng lên để quét và nhận diện tự động.</p>
+                                <button 
+                                    onClick={() => setIsAiModalOpen(true)}
+                                    className="w-full py-2.5 bg-[#f97316] hover:bg-[#ea580c] text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                                >
+                                    <Camera size={12} /> Bật Camera quét
+                                </button>
+                            </div>
+
                             {/* VIN Lookup */}
                             <div>
                                 <h3 className="text-xs font-black text-blue-950 uppercase tracking-[0.2em] mb-6 flex items-center justify-between border-b border-slate-50 pb-2">
@@ -501,6 +570,23 @@ const Shop = () => {
 
                     {/* Product Grid */}
                     <main className="flex-1">
+                        {aiScanLabel && (
+                            <div className="mb-6 bg-orange-50 border border-orange-100 p-4 rounded-xl flex items-center justify-between no-print animate-fade-in">
+                                <div className="flex items-center gap-3 text-orange-800">
+                                    <Camera size={18} className="text-orange-500 animate-pulse" />
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-wider text-orange-950">Đang xem kết quả quét AI</p>
+                                        <p className="text-[11px] font-medium mt-0.5">Nhãn đã nhận diện: <strong>{aiScanLabel}</strong></p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={clearAiScan}
+                                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all"
+                                >
+                                    Xóa bộ lọc AI
+                                </button>
+                            </div>
+                        )}
                         {loading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                                 {[1, 2, 3, 4, 5, 6].map(n => (
@@ -572,6 +658,20 @@ const Shop = () => {
                             </div>
                             
                             <div className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar">
+                                {/* AI Search Card - Mobile */}
+                                <div className="bg-[#18181b] border border-slate-800 p-5 rounded-2xl relative overflow-hidden group shadow-lg shadow-black/20 no-print">
+                                    <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                        <Camera size={14} className="text-[#f97316]" /> Tìm bằng AI
+                                    </h3>
+                                    <p className="text-slate-500 text-[10px] leading-relaxed mb-4 font-medium">Chụp hoặc tải ảnh phụ tùng lên để quét và nhận diện tự động.</p>
+                                    <button 
+                                        onClick={() => { setShowMobileFilters(false); setIsAiModalOpen(true); }}
+                                        className="w-full py-3 bg-[#f97316] hover:bg-[#ea580c] text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                                    >
+                                        <Camera size={12} /> Bật Camera quét
+                                    </button>
+                                </div>
+
                                 {/* VIN Lookup - Mobile */}
                                 <div>
                                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-50 pb-2 flex items-center justify-between">
@@ -762,6 +862,105 @@ const Shop = () => {
                                 <button onClick={() => setShowMobileFilters(false)} className="py-5 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 rounded-sm">Áp dụng</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Floating AI Scan Button for Mobile Devices */}
+            <button 
+                onClick={() => setIsAiModalOpen(true)}
+                className="fixed bottom-24 right-6 z-40 bg-[#f97316] hover:bg-[#ea580c] text-white p-4 rounded-full shadow-2xl shadow-orange-500/40 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/10 lg:hidden no-print"
+                title="Tìm kiếm phụ tùng bằng AI"
+            >
+                <Camera size={22} />
+            </button>
+
+            {/* AI Scan Modal */}
+            {isAiModalOpen && (
+                <div 
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget && !aiScanning) {
+                            setIsAiModalOpen(false);
+                        }
+                    }}
+                    className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+                >
+                    <div className="bg-[#18181b] border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl shadow-black/80 text-white relative animate-fade-in">
+                        <style dangerouslySetInnerHTML={{__html: `
+                            @keyframes laser {
+                                0% { top: 0%; }
+                                50% { top: 100%; }
+                                100% { top: 0%; }
+                            }
+                            .laser-line {
+                                position: absolute;
+                                left: 0;
+                                right: 0;
+                                height: 3px;
+                                background-color: #10b981;
+                                box-shadow: 0 0 8px #10b981, 0 0 15px #10b981;
+                                animation: laser 2s infinite linear;
+                            }
+                        `}} />
+                        
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
+                                <Camera className="text-[#f97316]" /> AI nhận diện phụ tùng
+                            </h3>
+                            <button 
+                                onClick={() => { if (!aiScanning) setIsAiModalOpen(false); }} 
+                                disabled={aiScanning}
+                                className="p-1 text-slate-500 hover:text-white rounded-lg transition-colors disabled:opacity-30"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {!aiPreview ? (
+                            <div className="border-2 border-dashed border-slate-800 rounded-2xl p-10 text-center hover:border-slate-700 transition-colors cursor-pointer relative group">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={handleAiImageChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+                                <UploadCloud size={48} className="mx-auto text-slate-600 group-hover:text-primary transition-colors mb-4" />
+                                <p className="text-sm font-bold text-slate-300">Kéo thả hoặc nhấp để tải ảnh lên</p>
+                                <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-wider">Hỗ trợ JPG, PNG, WEBP</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
+                                    <img src={aiPreview} alt="Quét AI" className="w-full h-full object-cover" />
+                                    {aiScanning && (
+                                        <>
+                                            <div className="absolute inset-0 bg-emerald-950/20" />
+                                            <div className="laser-line" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                                                <p className="text-xs font-black uppercase tracking-widest text-emerald-400 animate-pulse">AI đang nhận diện...</p>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={handleAiScan}
+                                        disabled={aiScanning}
+                                        className="bg-[#f97316] hover:bg-[#ea580c] text-white rounded-xl h-12 font-bold flex-1 text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition-all active:scale-[0.98] disabled:opacity-50"
+                                    >
+                                        {aiScanning ? 'ĐANG QUÉT...' : 'BẮT ĐẦU QUÉT AI'}
+                                    </button>
+                                    <button 
+                                        onClick={() => { setAiFile(null); setAiPreview(''); }}
+                                        disabled={aiScanning}
+                                        className="border border-slate-800 text-slate-400 hover:text-white rounded-xl h-12 font-bold px-6 text-xs uppercase tracking-wider hover:bg-slate-950 transition-colors"
+                                    >
+                                        HỦY
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
