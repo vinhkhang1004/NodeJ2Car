@@ -16,8 +16,11 @@ import {
     Check,
     Pencil,
     Trash2,
-    Heart
+    Heart,
+    BarChart2
 } from 'lucide-react';
+import { CompareContext } from '../context/CompareContext';
+import PartCard from '../components/PartCard';
 
 const PartDetail = () => {
     const [part, setPart] = useState({});
@@ -28,8 +31,10 @@ const PartDetail = () => {
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
     const { user, wishlist, toggleWishlist } = useContext(AuthContext);
+    const { addToCompare, removeFromCompare, isInCompare } = useContext(CompareContext);
 
     const isFavorite = wishlist.includes(id);
+    const isCompared = isInCompare(part._id || id);
 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -41,6 +46,7 @@ const PartDetail = () => {
     const [editingReviewId, setEditingReviewId] = useState(null);
     const [editRating, setEditRating] = useState(0);
     const [editComment, setEditComment] = useState('');
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
 
     const fetchPart = async () => {
@@ -56,8 +62,18 @@ const PartDetail = () => {
         }
     };
 
+    const fetchRelatedProducts = async () => {
+        try {
+            const { data } = await api.get(`/products/${id}/related`);
+            setRelatedProducts(data);
+        } catch (err) {
+            console.error('Failed to fetch related products:', err);
+        }
+    };
+
     useEffect(() => {
         fetchPart();
+        fetchRelatedProducts();
     }, [id]);
 
     const submitHandler = async (e) => {
@@ -282,10 +298,27 @@ const PartDetail = () => {
                                     <button onClick={() => { addToCart(part); alert('Đã thêm vào giỏ hàng!'); }} className="py-5 bg-slate-100 hover:bg-slate-200 text-blue-950 font-black uppercase tracking-[0.2em] text-xs transition-all border border-slate-200 flex-grow flex items-center justify-center gap-2">
                                         <ShoppingCart size={16} /> Thêm Giỏ Hàng
                                     </button>
+                                    <button 
+                                        onClick={() => {
+                                            if (isCompared) {
+                                                removeFromCompare(part._id || id);
+                                            } else {
+                                                addToCompare(part);
+                                            }
+                                        }}
+                                        className={`w-16 border flex items-center justify-center transition-all rounded-sm ${
+                                            isCompared 
+                                                ? 'bg-orange-500 border-orange-500 text-white hover:bg-orange-600' 
+                                                : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-orange-500 hover:bg-white'
+                                        }`}
+                                        title={isCompared ? 'Xóa khỏi danh sách so sánh' : 'Thêm vào danh sách so sánh'}
+                                    >
+                                        <BarChart2 size={20} />
+                                    </button>
                                     {user && (
                                         <button 
                                             onClick={() => toggleWishlist(part._id || id)}
-                                            className="w-16 bg-slate-50 border border-slate-200 flex items-center justify-center transition-all hover:bg-white group"
+                                            className="w-16 bg-slate-50 border border-slate-200 flex items-center justify-center transition-all hover:bg-white rounded-sm group"
                                             title={isFavorite ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
                                         >
                                             <Heart className={`transition-all duration-300 ${isFavorite ? 'fill-red-500 text-red-500 scale-110' : 'text-slate-400 group-hover:text-red-400'}`} size={20} />
@@ -300,6 +333,23 @@ const PartDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Related Products Section */}
+                {relatedProducts && relatedProducts.length > 0 && (
+                    <div className="mt-24 pt-16 border-t border-slate-100">
+                        <div className="flex items-center justify-between mb-12">
+                            <div>
+                                <p className="text-[10px] font-black text-[#f97316] uppercase tracking-[0.3em] mb-2">Đề xuất phụ tùng</p>
+                                <h2 className="text-3xl font-black text-blue-950 tracking-tighter uppercase">Sản phẩm liên quan & Thay thế</h2>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            {relatedProducts.map(p => (
+                                <PartCard key={p._id} part={p} />
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Reviews Section */}
                 <div className="mt-32 pt-24 border-t border-slate-100">

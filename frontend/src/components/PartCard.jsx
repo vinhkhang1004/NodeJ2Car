@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, ArrowUpRight, Heart } from 'lucide-react';
+import { ShoppingCart, ArrowUpRight, Heart, BarChart2 } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import { CompareContext } from '../context/CompareContext';
 import { getFileUrl } from '../lib/utils';
 import Rating from './Rating';
 
@@ -10,9 +11,20 @@ import Rating from './Rating';
 const PartCard = ({ part }) => {
   const { addToCart } = useContext(CartContext);
   const { wishlist, toggleWishlist, user } = useContext(AuthContext);
+  const { addToCompare, removeFromCompare, isInCompare } = useContext(CompareContext);
   
 
   const isFavorite = wishlist.includes(part._id);
+  const isCompared = isInCompare(part._id);
+
+  const handleCompareClick = (e) => {
+    e.preventDefault();
+    if (isCompared) {
+      removeFromCompare(part._id);
+    } else {
+      addToCompare(part);
+    }
+  };
 
   // Format price to VND style
   const formattedPrice = new Intl.NumberFormat('vi-VN', {
@@ -54,6 +66,19 @@ const PartCard = ({ part }) => {
           />
         </button>
       )}
+
+      {/* Compare Button */}
+      <button 
+        onClick={handleCompareClick} 
+        title={isCompared ? 'Xóa khỏi danh sách so sánh' : 'Thêm vào danh sách so sánh'}
+        className={`absolute top-16 right-4 z-20 w-10 h-10 backdrop-blur-md shadow-lg rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
+          isCompared 
+            ? 'bg-orange-500 text-white' 
+            : 'bg-white/80 text-slate-400 hover:text-orange-500'
+        }`}
+      >
+        <BarChart2 size={18} />
+      </button>
 
       {/* Image Container */}
       <div className="relative h-64 overflow-hidden bg-slate-50">

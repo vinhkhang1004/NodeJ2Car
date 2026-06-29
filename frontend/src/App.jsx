@@ -18,6 +18,7 @@ import Payment from './pages/Payment';
 import PlaceOrder from './pages/PlaceOrder';
 import OrderResult from './pages/OrderResult';
 import Wishlist from './pages/Wishlist';
+import OrderDetail from './pages/OrderDetail';
 
 // Legacy parts removed
 
@@ -42,6 +43,9 @@ import ReviewList from './pages/admin/ReviewList';
 import CouponManagement from './pages/admin/CouponManagement';
 import Offers from './pages/Offers';
 import Schematic from './pages/Schematic';
+import Compare from './pages/Compare';
+import CompareWidget from './components/CompareWidget';
+import { CompareProvider } from './context/CompareContext';
 
 
 
@@ -52,6 +56,7 @@ function PublicLayout() {
       <main className="animate-fade-in">
         <Outlet />
       </main>
+      <CompareWidget />
       <ChatWidget />
     </>
   );
@@ -59,20 +64,22 @@ function PublicLayout() {
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
-        <Routes>
-        {/* Public */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/offers" element={<Offers />} />
-          <Route path="/search/:keyword" element={<Shop />} />
+    <CompareProvider>
+      <CartProvider>
+        <Router>
+          <Routes>
+          {/* Public */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/offers" element={<Offers />} />
+            <Route path="/search/:keyword" element={<Shop />} />
+            <Route path="/compare" element={<Compare />} />
 
-          <Route path="/part/:id" element={<PartDetail />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/schematic" element={<Schematic />} />
+            <Route path="/part/:id" element={<PartDetail />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/schematic" element={<Schematic />} />
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/wishlist" element={<Wishlist />} />
@@ -80,6 +87,7 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/placeorder" element={<PlaceOrder />} />
             <Route path="/order-success/:id" element={<OrderResult />} />
+            <Route path="/order/:id" element={<OrderDetail />} />
           </Route>
         </Route>
 
@@ -126,9 +134,9 @@ function App() {
         </Route>
       </Routes>
       </Router>
-    </CartProvider>
+      </CartProvider>
+    </CompareProvider>
   );
 }
 
 export default App;
-
