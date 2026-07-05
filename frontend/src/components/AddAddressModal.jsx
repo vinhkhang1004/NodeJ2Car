@@ -8,7 +8,7 @@ import {
     Navigation, Tag, Loader2, Map as MapIcon 
 } from 'lucide-react';
 
-// Lazy load the map to prevent SSR issues
+
 const MapPicker = lazy(() => import('./MapPicker'));
 
 const AddAddressModal = ({ onClose, onSaved }) => {
