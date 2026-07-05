@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { BACKEND_BASE_URL } from '../config.js';
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -26,9 +27,6 @@ export function getFileUrl(path) {
     }
   }
 
-  // Prepend backend host and ensure leading slash
-  const backendUrl = 'http://localhost:5000';
   const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
-  
-  return `${backendUrl}${finalPath}`;
+  return `${BACKEND_BASE_URL}${finalPath}`;
 }

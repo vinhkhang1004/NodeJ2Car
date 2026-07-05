@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 
 
-const socket = io('http://localhost:5000');
+const socket = io();
 
 const ChatWidget = () => {
     const { user } = useContext(AuthContext);
